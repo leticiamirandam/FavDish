@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fillViewport="true"
     android:scrollbars="none"
-    tools:context=".view.fragments.DishDetailsFragment">
+    tools:context=".presentation.dishdetails.DishDetailsFragment">
 
     <RelativeLayout
         android:layout_width="match_parent"

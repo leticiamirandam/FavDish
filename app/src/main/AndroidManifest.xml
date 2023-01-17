@@ -11,7 +11,7 @@
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application
-        android:name=".application.FavDishApplication"
+        android:name=".di.FavDishApplication"
         android:allowBackup="true"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
@@ -21,13 +21,13 @@
         android:theme="@style/Theme.FavDish"
         tools:targetApi="31">
         <activity
-            android:name=".view.activities.AddUpdateDishActivity"
+            android:name="com.leticiamirandam.favdish.presentation.addupdate.AddUpdateDishActivity"
             android:configChanges="orientation"
             android:exported="false"
             android:label="Add Dish"
             android:theme="@style/Theme.FavDish.NoActionBar" />
         <activity
-            android:name=".view.activities.SplashActivity"
+            android:name="com.leticiamirandam.favdish.presentation.SplashActivity"
             android:exported="true"
             android:theme="@style/Theme.FavDish.NoActionBar">
             <intent-filter>
@@ -37,7 +37,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".view.activities.MainActivity"
+            android:name="com.leticiamirandam.favdish.presentation.MainActivity"
             android:exported="true" />
     </application>
 

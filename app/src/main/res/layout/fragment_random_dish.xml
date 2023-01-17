@@ -4,7 +4,7 @@
     android:id="@+id/srl_random_dish"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.fragments.RandomDishFragment">
+    tools:context=".presentation.randomdish.RandomDishFragment">
 
     <ScrollView
         android:id="@+id/rl_dish_detail_main"
@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:fillViewport="true"
         android:scrollbars="none"
-        tools:context=".view.fragments.DishDetailsFragment">
+        tools:context=".presentation.dishdetails.DishDetailsFragment">
 
         <RelativeLayout
             android:layout_width="match_parent"
