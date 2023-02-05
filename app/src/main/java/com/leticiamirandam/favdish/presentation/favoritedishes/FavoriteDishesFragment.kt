@@ -5,23 +5,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import com.leticiamirandam.favdish.data.cache.mapper.CacheToDomainMapper
-import com.leticiamirandam.favdish.di.FavDishApplication
 import com.leticiamirandam.favdish.databinding.FragmentFavoriteDishesBinding
 import com.leticiamirandam.favdish.domain.model.FavDish
 import com.leticiamirandam.favdish.presentation.MainActivity
 import com.leticiamirandam.favdish.presentation.common.adapters.FavDishAdapter
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class FavoriteDishesFragment : Fragment() {
 
     private var mBinding : FragmentFavoriteDishesBinding? = null
 
-    private val mFavDishViewModel : FavoriteDishesViewModel by viewModels {
-        FavoriteDishesViewModelFactory((requireActivity().application as FavDishApplication).repository)
-    }
+    private val mFavDishViewModel : FavoriteDishesViewModel by viewModel()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,9 +39,7 @@ class FavoriteDishesFragment : Fragment() {
                 if (it.isNotEmpty()) {
                     mBinding!!.rvFavoriteDishesList.visibility = View.VISIBLE
                     mBinding!!.tvNoFavoriteDishesAddedYet.visibility = View.GONE
-                    favDishAdapter.dishesList(it.map { favDish ->
-                        CacheToDomainMapper().mapFavDishCMToFavDish(favDish)
-                    })
+                    favDishAdapter.dishesList(it)
                 } else {
                     mBinding!!.rvFavoriteDishesList.visibility = View.GONE
                     mBinding!!.tvNoFavoriteDishesAddedYet.visibility = View.VISIBLE

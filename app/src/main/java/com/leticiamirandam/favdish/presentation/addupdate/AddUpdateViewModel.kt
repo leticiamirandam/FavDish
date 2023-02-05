@@ -1,32 +1,22 @@
 package com.leticiamirandam.favdish.presentation.addupdate
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.leticiamirandam.favdish.data.cache.mapper.CacheToDomainMapper
-import com.leticiamirandam.favdish.data.cache.mapper.RemoteToCacheMapper
-import com.leticiamirandam.favdish.data.cache.room.FavDishRepository
 import com.leticiamirandam.favdish.domain.model.FavDish
+import com.leticiamirandam.favdish.domain.usecase.AddDishUseCase
+import com.leticiamirandam.favdish.domain.usecase.UpdateDishUseCase
 import kotlinx.coroutines.launch
 
-class AddUpdateViewModel(private val repository: FavDishRepository) : ViewModel()  {
+internal class AddUpdateViewModel(
+    private val addDishUseCase: AddDishUseCase,
+    private val updateDishUseCase: UpdateDishUseCase,
+) : ViewModel() {
 
     fun insert(dish: FavDish) = viewModelScope.launch {
-        repository.insertFavDishData(RemoteToCacheMapper().mapFavDishToFavDishCM(dish))
+        addDishUseCase(dish)
     }
 
     fun update(dish: FavDish) = viewModelScope.launch {
-        repository.updateFavDishData(RemoteToCacheMapper().mapFavDishToFavDishCM(dish))
-    }
-}
-
-class AddUpdateViewModelFactory(private val repository: FavDishRepository) :
-    ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(AddUpdateViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return AddUpdateViewModel(repository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel Class")
+        updateDishUseCase(dish)
     }
 }

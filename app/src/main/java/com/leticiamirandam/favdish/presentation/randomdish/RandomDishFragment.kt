@@ -19,14 +19,13 @@ import com.leticiamirandam.favdish.databinding.FragmentRandomDishBinding
 import com.leticiamirandam.favdish.data.model.response.RandomDishResponse
 import com.leticiamirandam.favdish.domain.model.FavDish
 import com.leticiamirandam.favdish.utils.Constants
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class RandomDishFragment : Fragment() {
 
     private var mBinding: FragmentRandomDishBinding? = null
 
-    private val mRandomDishViewModel: RandomDishViewModel by viewModels {
-        RandomDishViewModelFactory(((requireActivity().application) as FavDishApplication).repository)
-    }
+    private val mRandomDishViewModel: RandomDishViewModel by viewModel()
 
     private var mProgressDialog: Dialog? = null
 
@@ -67,7 +66,7 @@ class RandomDishFragment : Fragment() {
         mRandomDishViewModel.randomDishResponse.observe(viewLifecycleOwner) { randomDishResponse ->
             if (mBinding!!.srlRandomDish.isRefreshing)
                 mBinding!!.srlRandomDish.isRefreshing = false
-            setRandomDishResponseInUI(randomDishResponse.recipes[0])
+            setRandomDishResponseInUI(randomDishResponse)
         }
         mRandomDishViewModel.randomDishLoadingError.observe(viewLifecycleOwner) { dataError ->
             dataError.let {
@@ -88,35 +87,23 @@ class RandomDishFragment : Fragment() {
         }
     }
 
-    private fun setRandomDishResponseInUI(recipe: RandomDishResponse.RecipeResponse) {
+    private fun setRandomDishResponseInUI(favDish: FavDish) {
         Glide.with(requireActivity())
-            .load(recipe.image)
+            .load(favDish.image)
             .centerCrop()
             .into(mBinding!!.ivDishImage)
-        mBinding!!.tvTitle.text = recipe.title
-        var dishType: String = "other"
-        if (recipe.dishTypes.isNotEmpty()) {
-            dishType = recipe.dishTypes[0]
-            mBinding!!.tvType.text = dishType
-        }
+        mBinding!!.tvTitle.text = favDish.title
+        mBinding!!.tvType.text = favDish.type
         mBinding!!.tvCategory.text = "Other"
-        var ingredients = ""
-        for (value in recipe.extendedIngredients) {
-            if (ingredients.isEmpty()) {
-                ingredients = value.original
-            } else {
-                ingredients = ingredients + ", \n" + value.original
-            }
-        }
-        mBinding!!.tvIngredients.text = ingredients
+        mBinding!!.tvIngredients.text = favDish.ingredients
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             mBinding!!.tvCookingDirection.text = Html.fromHtml(
-                recipe.instructions,
+                favDish.directionToCook,
                 Html.FROM_HTML_MODE_COMPACT
             )
         } else {
             @Suppress("DEPRECATION")
-            mBinding!!.tvCookingDirection.text = Html.fromHtml(recipe.instructions)
+            mBinding!!.tvCookingDirection.text = Html.fromHtml(favDish.directionToCook)
         }
         mBinding!!.ivFavoriteDish.setImageDrawable(
             ContextCompat.getDrawable(
@@ -129,7 +116,7 @@ class RandomDishFragment : Fragment() {
         mBinding!!.tvCookingTime.text =
             resources.getString(
                 R.string.lbl_estimate_cooking_time,
-                recipe.readyInMinutes.toString()
+                favDish.cookingTime
             )
         mBinding!!.ivFavoriteDish.setOnClickListener {
             if (addedToFavorites) {
@@ -140,14 +127,15 @@ class RandomDishFragment : Fragment() {
                 ).show()
             } else {
                 val randomDishDetais = FavDish(
-                    image = recipe.image,
+                    id = favDish.id,
+                    image = favDish.image,
                     imageSource = Constants.DISH_IMAGE_SOURCE_ONLINE,
-                    title = recipe.title,
-                    type = dishType,
+                    title = favDish.title,
+                    type = favDish.type,
                     category = "Other",
-                    ingredients = ingredients,
-                    cookingTime = recipe.readyInMinutes.toString(),
-                    directionToCook = recipe.instructions,
+                    ingredients = favDish.ingredients,
+                    cookingTime = favDish.cookingTime,
+                    directionToCook = favDish.directionToCook,
                     favoriteDish = true
                 )
                 mRandomDishViewModel.insert(randomDishDetais)

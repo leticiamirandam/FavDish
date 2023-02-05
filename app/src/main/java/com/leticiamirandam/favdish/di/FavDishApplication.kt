@@ -8,17 +8,17 @@ import org.koin.core.context.startKoin
 
 class FavDishApplication : Application() {
 
-    private val database by lazy { FavDishRoomDatabase.getDatabase(this@FavDishApplication) }
-
-    val repository by lazy { FavDishRepository(database.favDishDao()) }
-
     override fun onCreate() {
         super.onCreate()
         startKoin {
             androidContext(this@FavDishApplication)
             modules(
                 listOf(
-                    networkModule, favDishNetworkModule
+                    networkModule,
+                    cacheModule,
+                    domainModule,
+                    dataModule,
+                    presentationModule
                 )
             )
         }

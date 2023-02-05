@@ -16,7 +16,6 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import androidx.palette.graphics.Palette
 import com.bumptech.glide.Glide
@@ -26,9 +25,9 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.leticiamirandam.favdish.R
 import com.leticiamirandam.favdish.databinding.FragmentDishDetailsBinding
-import com.leticiamirandam.favdish.di.FavDishApplication
 import com.leticiamirandam.favdish.domain.model.FavDish
 import com.leticiamirandam.favdish.utils.Constants
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.IOException
 import java.util.*
 
@@ -37,9 +36,7 @@ class DishDetailsFragment : Fragment() {
     private var mFavDishDetails: FavDish? = null
 
     private var mBinding: FragmentDishDetailsBinding? = null
-    private val dishDetailsViewModel: DishDetailsViewModel by viewModels {
-        DishDetailsViewModelFactory(((requireActivity().application) as FavDishApplication).repository)
-    }
+    private val dishDetailsViewModel: DishDetailsViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

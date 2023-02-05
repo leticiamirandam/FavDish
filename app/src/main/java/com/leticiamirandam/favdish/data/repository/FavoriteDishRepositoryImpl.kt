@@ -1,17 +1,16 @@
 package com.leticiamirandam.favdish.data.repository
 
+import com.leticiamirandam.favdish.data.cache.datasource.favoritedish.FavoriteDishCacheDataSource
 import com.leticiamirandam.favdish.data.cache.mapper.CacheToDomainMapper
-import com.leticiamirandam.favdish.data.cache.mapper.RemoteToCacheMapper
-import com.leticiamirandam.favdish.data.cache.room.FavDishDao
 import com.leticiamirandam.favdish.domain.model.FavDish
 import com.leticiamirandam.favdish.domain.repository.FavoriteDishesRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 internal class FavoriteDishRepositoryImpl(
-    private val favDishDao: FavDishDao,
+    private val favoriteDishCacheDataSource: FavoriteDishCacheDataSource,
     private val cacheToDomainMapper: CacheToDomainMapper,
-    private val remoteToCacheMapper: RemoteToCacheMapper,
 ): FavoriteDishesRepository {
-    override fun getFavoriteDishes(): List<FavDish> {
-        TODO("Not yet implemented")
-    }
+    override fun getFavoriteDishes(): Flow<List<FavDish>> =
+        favoriteDishCacheDataSource.getFavoriteDishes().map { cacheToDomainMapper.map(it) }
 }

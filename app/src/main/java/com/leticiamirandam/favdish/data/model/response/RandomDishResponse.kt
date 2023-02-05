@@ -1,21 +1,27 @@
 package com.leticiamirandam.favdish.data.model.response
 
-object RandomDishResponse {
+import com.google.gson.annotations.SerializedName
+
+data class RandomDishResponse(
+    val recipesListResponse: RecipesListResponse
+) {
+
     data class RecipesListResponse(
-        val recipes: List<RecipeResponse>
+        @SerializedName("recipes") val recipes: List<RecipeResponse>
     )
 
     data class RecipeResponse(
-        val id: Int,
-        val image: String,
-        val title: String,
-        val dishTypes: List<String>,
-        val extendedIngredients: List<ExtendedIngredientResponse>,
-        val readyInMinutes: Int,
-        val instructions: String,
+        @SerializedName("id") val id: Int,
+        @SerializedName("image") val image: String,
+        @SerializedName("title") val title: String,
+        @SerializedName("dishTypes") val dishTypes: List<String>,
+        @SerializedName("extendedIngredients") val extendedIngredients: List<ExtendedIngredientResponse>,
+        @SerializedName("readyInMinutes") val readyInMinutes: Int,
+        @SerializedName("instructions") val instructions: String,
     )
 
     data class ExtendedIngredientResponse(
-        val original: String,
+        @SerializedName("original") val original: String,
     )
 }
+

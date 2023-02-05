@@ -11,22 +11,19 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.leticiamirandam.favdish.R
-import com.leticiamirandam.favdish.data.cache.mapper.CacheToDomainMapper
-import com.leticiamirandam.favdish.data.cache.model.FavDishCM
 import com.leticiamirandam.favdish.databinding.DialogCustomListBinding
 import com.leticiamirandam.favdish.databinding.FragmentAllDishesBinding
-import com.leticiamirandam.favdish.di.FavDishApplication
 import com.leticiamirandam.favdish.domain.model.FavDish
 import com.leticiamirandam.favdish.presentation.MainActivity
 import com.leticiamirandam.favdish.presentation.addupdate.AddUpdateDishActivity
 import com.leticiamirandam.favdish.presentation.common.adapters.CustomListItemAdapter
 import com.leticiamirandam.favdish.presentation.common.adapters.FavDishAdapter
 import com.leticiamirandam.favdish.utils.Constants
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class AllDishesFragment : Fragment() {
 
@@ -36,9 +33,7 @@ class AllDishesFragment : Fragment() {
 
     private lateinit var mCustomListDialog: Dialog
 
-    private val allDishesViewModel: AllDishesViewModel by viewModels {
-        AllDishesViewModelFactory((requireActivity().application as FavDishApplication).repository)
-    }
+    private val allDishesViewModel: AllDishesViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,9 +60,7 @@ class AllDishesFragment : Fragment() {
                 if (it.isNotEmpty()) {
                     mBinding.rvDishesList.visibility = View.VISIBLE
                     mBinding.tvNoDishesAddedYet.visibility = View.GONE
-                    mFavDishAdapter.dishesList(it.map { favDish ->
-                        CacheToDomainMapper().mapFavDishCMToFavDish(favDish)
-                    })
+                    mFavDishAdapter.dishesList(it)
                 } else {
                     mBinding.rvDishesList.visibility = View.GONE
                     mBinding.tvNoDishesAddedYet.visibility = View.VISIBLE
@@ -87,7 +80,7 @@ class AllDishesFragment : Fragment() {
         }
     }
 
-    fun deleteDish(dish: FavDishCM) {
+    fun deleteDish(dish: FavDish) {
         val builder = AlertDialog.Builder(requireActivity())
         builder.setTitle(resources.getString(R.string.title_delete_dish))
         builder.setMessage(resources.getString(R.string.msg_delete_dish_dialog, dish.title))
@@ -156,9 +149,7 @@ class AllDishesFragment : Fragment() {
                     if (it.isNotEmpty()) {
                         mBinding.rvDishesList.visibility = View.VISIBLE
                         mBinding.tvNoDishesAddedYet.visibility = View.GONE
-                        mFavDishAdapter.dishesList(it.map { favDish ->
-                            CacheToDomainMapper().mapFavDishCMToFavDish(favDish)
-                        })
+                        mFavDishAdapter.dishesList(it)
                     } else {
                         mBinding.rvDishesList.visibility = View.GONE
                         mBinding.tvNoDishesAddedYet.visibility = View.VISIBLE
@@ -172,9 +163,7 @@ class AllDishesFragment : Fragment() {
                         if(it.isNotEmpty()) {
                             mBinding.rvDishesList.visibility = View.VISIBLE
                             mBinding.tvNoDishesAddedYet.visibility = View.GONE
-                            mFavDishAdapter.dishesList(it.map { favDish ->
-                                CacheToDomainMapper().mapFavDishCMToFavDish(favDish)
-                            })
+                            mFavDishAdapter.dishesList(it)
                         } else {
                             mBinding.rvDishesList.visibility = View.GONE
                             mBinding.tvNoDishesAddedYet.visibility = View.VISIBLE

@@ -1,27 +1,25 @@
 package com.leticiamirandam.favdish.data.repository
 
+import com.leticiamirandam.favdish.data.cache.datasource.alldishes.AllDishesCacheDataSource
 import com.leticiamirandam.favdish.data.cache.mapper.CacheToDomainMapper
 import com.leticiamirandam.favdish.data.cache.mapper.RemoteToCacheMapper
-import com.leticiamirandam.favdish.data.cache.model.FavDishCM
-import com.leticiamirandam.favdish.data.cache.room.FavDishDao
 import com.leticiamirandam.favdish.domain.model.FavDish
 import com.leticiamirandam.favdish.domain.repository.AllDishesRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 internal class AllDishesRepositoryImpl(
-    private val favDishDao: FavDishDao,
-    private val remoteToCacheMapper: RemoteToCacheMapper,
+    private val allDishesCacheDataSource: AllDishesCacheDataSource,
     private val cacheToDomainMapper: CacheToDomainMapper,
-): AllDishesRepository {
-    override fun getAllDishesList(): List<FavDish> {
-        TODO("Not yet implemented")
+    private val remoteToCacheMapper: RemoteToCacheMapper,
+) : AllDishesRepository {
+    override fun getAllDishesList(): Flow<List<FavDish>> =
+        allDishesCacheDataSource.getAllDishes().map { cacheToDomainMapper.map(it) }
+
+    override fun deleteDish(dish: FavDish) {
+        allDishesCacheDataSource.deleteDish(remoteToCacheMapper.mapFavDishToFavDishCM(dish))
     }
 
-    override fun deleteDish(dish: FavDishCM) {
-        TODO("Not yet implemented")
-    }
-
-    override fun getFilteredDishesList(): List<FavDish> {
-        TODO("Not yet implemented")
-    }
-
+    override fun getFilteredDishesList(filterType: String): Flow<List<FavDish>> =
+        allDishesCacheDataSource.getFilteredDishes(filterType).map { cacheToDomainMapper.map(it) }
 }

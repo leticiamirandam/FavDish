@@ -5,7 +5,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class FavDish(
-    val id: Int? = 0,
+    val id: Int?,
     val image: String,
     val imageSource: String,
     val title: String,

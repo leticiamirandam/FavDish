@@ -5,6 +5,11 @@ import com.leticiamirandam.favdish.domain.model.FavDish
 
 internal class CacheToDomainMapper {
 
+    fun map(favDishList: List<FavDishCM>) =
+        favDishList.map {
+            mapFavDishCMToFavDish(it)
+        }
+
     fun mapFavDishCMToFavDish(favDishCM: FavDishCM) = FavDish(
         id = favDishCM.id,
         image = favDishCM.image,

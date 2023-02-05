@@ -1,10 +1,10 @@
 package com.leticiamirandam.favdish.domain.repository
 
-import com.leticiamirandam.favdish.data.cache.model.FavDishCM
 import com.leticiamirandam.favdish.domain.model.FavDish
+import kotlinx.coroutines.flow.Flow
 
 internal interface AllDishesRepository {
-    fun getAllDishesList(): List<FavDish>
-    fun deleteDish(dish: FavDishCM)
-    fun getFilteredDishesList(): List<FavDish>
+    fun getAllDishesList(): Flow<List<FavDish>>
+    fun deleteDish(dish: FavDish)
+    fun getFilteredDishesList(filterType: String): Flow<List<FavDish>>
 }

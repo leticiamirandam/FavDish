@@ -3,6 +3,7 @@ package com.leticiamirandam.favdish.data.cache.room
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.leticiamirandam.favdish.data.cache.model.FavDishCM
@@ -11,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface FavDishDao {
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertFavoriteDishDetails(favDish: FavDishCM)
 
     @Query("SELECT * FROM FAV_DISHES_TABLE ORDER BY ID")

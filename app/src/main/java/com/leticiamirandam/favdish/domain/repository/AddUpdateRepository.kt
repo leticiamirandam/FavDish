@@ -1,8 +1,8 @@
 package com.leticiamirandam.favdish.domain.repository
 
-import com.leticiamirandam.favdish.data.cache.model.FavDishCM
+import com.leticiamirandam.favdish.domain.model.FavDish
 
 internal interface AddUpdateRepository {
-    fun insertDish(dish: FavDishCM)
-    fun updateDish(dish: FavDishCM)
+    fun insertDish(dish: FavDish)
+    fun updateDish(dish: FavDish)
 }

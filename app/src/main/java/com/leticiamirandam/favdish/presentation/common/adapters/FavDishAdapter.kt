@@ -59,7 +59,7 @@ class FavDishAdapter(private val fragment: Fragment) :
                     fragment.requireActivity().startActivity(intent)
                 } else if (it.itemId == R.id.action_delete_dish) {
                     if (fragment is AllDishesFragment) {
-                        fragment.deleteDish(RemoteToCacheMapper().mapFavDishToFavDishCM(dish))
+                        fragment.deleteDish(dish)
                     }
                 }
                 true
