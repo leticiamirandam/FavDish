@@ -10,13 +10,16 @@ import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.work.Constraints
+import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.leticiamirandam.favdish.R
 import com.leticiamirandam.favdish.databinding.ActivityMainBinding
 import com.leticiamirandam.favdish.notification.NotifyWorker
+import com.leticiamirandam.favdish.notification.OneTimeRequestWorker
 import com.leticiamirandam.favdish.utils.Constants
 import java.util.concurrent.TimeUnit
 
@@ -41,7 +44,7 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(mNavController, appBarConfiguration)
         mBinding.navView.setupWithNavController(mNavController)
-        if(intent.hasExtra(Constants.NOTIFICATION_ID)){
+        if(intent.hasExtra(Constants.NOTIFICATION_ID)) {
             val notificationId = intent.getIntExtra(Constants.NOTIFICATION_ID, 0)
             mBinding.navView.selectedItemId = R.id.navigation_random_dish
         }
@@ -54,9 +57,24 @@ class MainActivity : AppCompatActivity() {
         .setRequiresBatteryNotLow(true)
         .build()
 
+    private fun createTimerWorkRequest(): OneTimeWorkRequest {
+        val timer = Data.Builder()
+        timer.putInt("timer", 5)
+        return OneTimeWorkRequest.Builder(OneTimeRequestWorker::class.java)
+            .setInitialDelay(2, TimeUnit.MINUTES)
+            .setInputData(timer.build())
+            .setConstraints(createConstraints())
+            .build()
+    }
+
     private fun createWorkRequest() = PeriodicWorkRequestBuilder<NotifyWorker>(15, TimeUnit.MINUTES)
         .setConstraints(createConstraints())
         .build()
+
+
+    private fun startOneTimeWork() {
+        WorkManager.getInstance(this).enqueue(createTimerWorkRequest())
+    }
 
     private fun startWork() {
         WorkManager.getInstance(this)

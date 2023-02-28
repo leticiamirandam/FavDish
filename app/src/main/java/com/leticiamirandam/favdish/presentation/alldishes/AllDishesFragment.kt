@@ -4,12 +4,14 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
@@ -28,12 +30,10 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class AllDishesFragment : Fragment() {
 
     private lateinit var mBinding: FragmentAllDishesBinding
-
     private lateinit var mFavDishAdapter: FavDishAdapter
-
     private lateinit var mCustomListDialog: Dialog
-
     private val allDishesViewModel: AllDishesViewModel by viewModel()
+    private var mProgressDialog: Dialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,9 +54,17 @@ class AllDishesFragment : Fragment() {
         mBinding.rvDishesList.layoutManager = GridLayoutManager(requireActivity(), 2)
         mFavDishAdapter = FavDishAdapter(this@AllDishesFragment)
         mBinding.rvDishesList.adapter = mFavDishAdapter
+        allDishesViewModelObserver()
+    }
 
-        allDishesViewModel.allDishesList.observe(viewLifecycleOwner) { dishes ->
-            dishes.let {
+    override fun onStart() {
+        super.onStart()
+        allDishesViewModel.getAllDishes()
+    }
+
+    private fun allDishesViewModelObserver() {
+        allDishesViewModel.allDishesListResponse.observe(viewLifecycleOwner) { allDishes ->
+            allDishes.let {
                 if (it.isNotEmpty()) {
                     mBinding.rvDishesList.visibility = View.VISIBLE
                     mBinding.tvNoDishesAddedYet.visibility = View.GONE
@@ -66,6 +74,56 @@ class AllDishesFragment : Fragment() {
                     mBinding.tvNoDishesAddedYet.visibility = View.VISIBLE
                 }
             }
+        }
+        allDishesViewModel.deleteDishResponse.observe(viewLifecycleOwner) { deletedDish ->
+            deletedDish.let {
+                if (deletedDish) {
+                    Toast.makeText(
+                        context,
+                        "Dish deleted successfully.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    Log.e("Favorite Dish API Error", "$deletedDish")
+                    allDishesViewModel.getAllDishes()
+                }
+            }
+        }
+        allDishesViewModel.allDishesLoadingError.observe(viewLifecycleOwner) { dataError ->
+            dataError.let {
+                if (dataError) {
+                    Toast.makeText(
+                        context,
+                        "An error has ocurred while trying to get the dishes list.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    Log.e("Favorite Dish API Error", "$dataError")
+                }
+            }
+        }
+        allDishesViewModel.loadAllDishes.observe(viewLifecycleOwner) { loadFavoriteDishes ->
+            loadFavoriteDishes.let {
+                Log.e("Favorite Dishes Loading", "$loadFavoriteDishes")
+                if (loadFavoriteDishes) {
+                    showCustomProgressDialog()
+                } else {
+                    hideProgressDialog()
+                }
+            }
+        }
+    }
+
+
+    private fun showCustomProgressDialog() {
+        mProgressDialog = Dialog(requireActivity())
+        mProgressDialog?.let {
+            it.setContentView(R.layout.dialog_custom_progress)
+            it.show()
+        }
+    }
+
+    private fun hideProgressDialog() {
+        mProgressDialog?.let {
+            it.dismiss()
         }
     }
 
@@ -86,7 +144,7 @@ class AllDishesFragment : Fragment() {
         builder.setMessage(resources.getString(R.string.msg_delete_dish_dialog, dish.title))
         builder.setIcon(android.R.drawable.ic_dialog_alert)
         builder.setPositiveButton(resources.getString(R.string.lbl_yes)) { dialogInterface, _ ->
-            allDishesViewModel.delete(dish)
+            allDishesViewModel.deleteDish(dish)
             dialogInterface.dismiss()
         }
         builder.setNegativeButton(resources.getString(R.string.lbl_no)) { dialogInterface, _ ->
@@ -144,32 +202,9 @@ class AllDishesFragment : Fragment() {
     fun filterSelection(filterItemSelection: String) {
         mCustomListDialog.dismiss()
         if (filterItemSelection == Constants.ALL_ITEMS) {
-            allDishesViewModel.allDishesList.observe(viewLifecycleOwner) { dishes ->
-                dishes.let {
-                    if (it.isNotEmpty()) {
-                        mBinding.rvDishesList.visibility = View.VISIBLE
-                        mBinding.tvNoDishesAddedYet.visibility = View.GONE
-                        mFavDishAdapter.dishesList(it)
-                    } else {
-                        mBinding.rvDishesList.visibility = View.GONE
-                        mBinding.tvNoDishesAddedYet.visibility = View.VISIBLE
-                    }
-                }
-            }
+            allDishesViewModel.getAllDishes()
         } else {
             allDishesViewModel.getFilteredList(filterItemSelection)
-                .observe(viewLifecycleOwner) { dishes ->
-                    dishes.let {
-                        if(it.isNotEmpty()) {
-                            mBinding.rvDishesList.visibility = View.VISIBLE
-                            mBinding.tvNoDishesAddedYet.visibility = View.GONE
-                            mFavDishAdapter.dishesList(it)
-                        } else {
-                            mBinding.rvDishesList.visibility = View.GONE
-                            mBinding.tvNoDishesAddedYet.visibility = View.VISIBLE
-                        }
-                    }
-                }
         }
     }
 }

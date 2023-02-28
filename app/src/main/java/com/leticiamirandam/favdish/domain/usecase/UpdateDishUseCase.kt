@@ -6,7 +6,7 @@ import com.leticiamirandam.favdish.domain.repository.AddUpdateRepository
 internal class UpdateDishUseCase(
     private val addUpdateRepository: AddUpdateRepository,
 ) {
-    operator fun invoke(favDish: FavDish) {
+    suspend operator fun invoke(favDish: FavDish) {
         addUpdateRepository.updateDish(favDish)
     }
 }

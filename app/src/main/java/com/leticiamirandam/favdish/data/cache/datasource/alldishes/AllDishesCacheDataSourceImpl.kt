@@ -9,14 +9,14 @@ internal class AllDishesCacheDataSourceImpl(
     private val favDishDao: FavDishDao,
 ) : AllDishesCacheDataSource {
     override fun getAllDishes(): Flow<List<FavDishCM>> = flow {
-        favDishDao.getAllDishesList()
+        emit(favDishDao.getAllDishesList())
     }
 
-    override fun deleteDish(favDishCM: FavDishCM) {
-        flow { emit(favDishDao.deleteFavDishDetails(favDishCM)) }
+    override fun deleteDish(favDishCM: FavDishCM): Flow<Int> = flow {
+        emit(favDishDao.deleteFavDishDetails(favDishCM))
     }
 
     override fun getFilteredDishes(filterType: String): Flow<List<FavDishCM>> = flow {
-        favDishDao.getFilteredDishesList(filterType)
+        emit(favDishDao.getFilteredDishesList(filterType))
     }
 }

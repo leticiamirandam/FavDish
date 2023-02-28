@@ -15,18 +15,18 @@ interface FavDishDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertFavoriteDishDetails(favDish: FavDishCM)
 
-    @Query("SELECT * FROM FAV_DISHES_TABLE ORDER BY ID")
-    fun getAllDishesList(): Flow<List<FavDishCM>>
+    @Query("SELECT * FROM FAV_DISHES ORDER BY ID")
+    suspend fun getAllDishesList(): List<FavDishCM>
 
     @Update
     suspend fun updateFavDishDetails(favDish: FavDishCM)
 
-    @Query("SELECT * FROM FAV_DISHES_TABLE WHERE favorite_dish = 1")
-    fun geFavoriteDishesList(): Flow<List<FavDishCM>>
+    @Query("SELECT * FROM FAV_DISHES WHERE favorite_dish = 1")
+    fun geFavoriteDishesList(): List<FavDishCM>
 
     @Delete
-    suspend fun deleteFavDishDetails(favDish: FavDishCM)
+    suspend fun deleteFavDishDetails(favDish: FavDishCM) : Int
 
-    @Query("SELECT * FROM FAV_DISHES_TABLE WHERE type = :filterType")
-    fun getFilteredDishesList(filterType: String): Flow<List<FavDishCM>>
+    @Query("SELECT * FROM FAV_DISHES WHERE type = :filterType")
+    suspend fun getFilteredDishesList(filterType: String): List<FavDishCM>
 }

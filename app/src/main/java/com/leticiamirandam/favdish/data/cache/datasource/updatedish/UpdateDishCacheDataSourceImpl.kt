@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.flow
 internal class UpdateDishCacheDataSourceImpl(
     private val favDishDao: FavDishDao,
 ) : UpdateDishCacheDataSource {
-    override fun updateDish(favDishCM: FavDishCM) {
-        flow { emit(favDishDao.updateFavDishDetails(favDishCM)) }
+    override suspend fun updateDish(favDishCM: FavDishCM) {
+        favDishDao.updateFavDishDetails(favDishCM)
     }
 }

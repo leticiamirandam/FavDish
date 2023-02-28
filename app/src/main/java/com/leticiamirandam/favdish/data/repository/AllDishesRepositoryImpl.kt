@@ -16,9 +16,8 @@ internal class AllDishesRepositoryImpl(
     override fun getAllDishesList(): Flow<List<FavDish>> =
         allDishesCacheDataSource.getAllDishes().map { cacheToDomainMapper.map(it) }
 
-    override fun deleteDish(dish: FavDish) {
+    override fun deleteDish(dish: FavDish): Flow<Int> =
         allDishesCacheDataSource.deleteDish(remoteToCacheMapper.mapFavDishToFavDishCM(dish))
-    }
 
     override fun getFilteredDishesList(filterType: String): Flow<List<FavDish>> =
         allDishesCacheDataSource.getFilteredDishes(filterType).map { cacheToDomainMapper.map(it) }

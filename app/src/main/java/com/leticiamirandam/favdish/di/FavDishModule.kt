@@ -158,7 +158,7 @@ val presentationModule = module {
     viewModel {
         RandomDishViewModel(
             getRandomDishUseCase = get(),
-            updateDishUseCase = get(),
+            addDishUseCase = get(),
         )
     }
 }

@@ -11,6 +11,7 @@ import android.graphics.Color
 import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.os.Build
+import android.support.v4.media.MediaBrowserCompat.MediaItem.Flags
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.work.Worker
@@ -44,7 +45,11 @@ class NotifyWorker(context: Context, workerParams: WorkerParameters) :
             .bigPicture(bitmap)
             .bigLargeIcon(null)
 
-        val pendingIntent = PendingIntent.getActivity(applicationContext, 0, intent, 0)
+        val pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            PendingIntent.getActivity(applicationContext, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+        } else {
+            PendingIntent.getActivity(applicationContext, 0, intent, 0)
+        }
         val notification = NotificationCompat.Builder(applicationContext, Constants.NOTIFICATION_CHANNEL)
             .setContentTitle(titleNotification)
             .setContentText(subtitleNotification)

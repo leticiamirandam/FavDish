@@ -114,7 +114,7 @@ class AddUpdateDishActivity : AppCompatActivity(), View.OnClickListener {
             R.id.et_category -> {
                 customItemsDialog(
                     resources.getString(R.string.title_select_dish_category),
-                    resources.getStringArray(R.array.dish_types).toList(),
+                    resources.getStringArray(R.array.dish_categories).toList(),
                     Constants.DISH_CATEGORY
                 )
                 return

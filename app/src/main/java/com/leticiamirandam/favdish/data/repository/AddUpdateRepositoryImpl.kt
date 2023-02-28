@@ -11,11 +11,11 @@ internal class AddUpdateRepositoryImpl(
     private val updateCacheDataSource: UpdateDishCacheDataSource,
     private val remoteToCacheMapper: RemoteToCacheMapper,
 ): AddUpdateRepository {
-    override fun insertDish(dish: FavDish) {
+    override suspend fun insertDish(dish: FavDish) {
         addDishCacheDataSource.addDish(remoteToCacheMapper.mapFavDishToFavDishCM(dish))
     }
 
-    override fun updateDish(dish: FavDish) {
+    override suspend fun updateDish(dish: FavDish) {
         updateCacheDataSource.updateDish(remoteToCacheMapper.mapFavDishToFavDishCM(dish))
     }
 }

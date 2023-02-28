@@ -5,6 +5,6 @@ import kotlinx.coroutines.flow.Flow
 
 internal interface AllDishesCacheDataSource {
     fun getAllDishes(): Flow<List<FavDishCM>>
-    fun deleteDish(favDishCM: FavDishCM)
+    fun deleteDish(favDishCM: FavDishCM): Flow<Int>
     fun getFilteredDishes(filterType: String): Flow<List<FavDishCM>>
 }

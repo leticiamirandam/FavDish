@@ -5,6 +5,6 @@ import kotlinx.coroutines.flow.Flow
 
 internal interface AllDishesRepository {
     fun getAllDishesList(): Flow<List<FavDish>>
-    fun deleteDish(dish: FavDish)
+    fun deleteDish(dish: FavDish): Flow<Int>
     fun getFilteredDishesList(filterType: String): Flow<List<FavDish>>
 }

@@ -4,9 +4,9 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "fav_dishes_table")
+@Entity(tableName = "fav_dishes")
 data class FavDishCM(
-    @PrimaryKey(autoGenerate = true) val id: Int?,
+    @PrimaryKey(autoGenerate = true) val id: Int? = null,
     @ColumnInfo(name = "image") val image: String,
     @ColumnInfo(name = "image_source") val imageSource: String,
     @ColumnInfo(name = "title") val title: String,

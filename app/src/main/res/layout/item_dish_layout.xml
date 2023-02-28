@@ -24,8 +24,7 @@
                 android:layout_margin="@dimen/_1sdp"
                 android:contentDescription="@string/image_contentDescription"
                 android:scaleType="fitXY"
-                android:src="@mipmap/ic_launcher"
-                android:alpha="0.7"/>
+                android:src="@mipmap/ic_launcher"/>
 
             <ImageButton
                 android:id="@+id/ib_more"

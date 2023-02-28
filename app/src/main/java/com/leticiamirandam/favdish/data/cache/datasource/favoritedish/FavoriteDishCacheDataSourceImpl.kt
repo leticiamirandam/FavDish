@@ -9,6 +9,6 @@ internal class FavoriteDishCacheDataSourceImpl(
     private val favDishDao: FavDishDao,
 ): FavoriteDishCacheDataSource {
     override fun getFavoriteDishes(): Flow<List<FavDishCM>> = flow {
-        favDishDao.geFavoriteDishesList()
+        emit(favDishDao.geFavoriteDishesList())
     }
 }

@@ -97,7 +97,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
-    implementation "androidx.work:work-runtime-ktx:2.5.0"
+    implementation 'androidx.work:work-runtime-ktx:2.7.1'
 
     // Koin - Dependency Injection
     implementation "org.koin:koin-android:$koin_version"
