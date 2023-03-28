@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FavDish</string>
+    <string name="splash_screen_title">Fav Dish</string>
+    <string name="msg_added_to_favorites">Você adicionou o prato aos favoritos.</string>
+    <string name="msg_removed_from_favorites">Você removeu o prato dos favoritos.</string>
+    <string name="notification_title">Fique de olho nas novas receitas!</string>
+    <string name="notification_subtitle">Clique para mais detalhes</string>
+
+    <!-- DialogCustomImageSelect -->
+    <string name="lbl_camera">Câmera</string>
+    <string name="lbl_gallery">Galeria</string>
+    <string name="title_dish_details">Detalhes do prato</string>
+    <string name="title_select_image_action">Selecione a imagem</string>
+
+    <!-- FavDishAdapter -->
+    <string name="action_edit_dish">EDITAR PRATO</string>
+    <string name="action_delete_dish">DELETAR PRATO</string>
+
+    <!-- AllDishesFragment -->
+    <string name="title_all_dishes">Todos os pratos</string>
+    <string name="title_delete_dish">Deletar prato</string>
+    <string name="msg_delete_dish_dialog">Tem certeza de que deseja excluir %1$s ?</string>
+    <string name="lbl_yes">Sim</string>
+    <string name="lbl_no">Não</string>
+    <string name="action_filter_dishes">Filtrar pratos</string>
+    <string name="title_select_item_to_filter">SELECIONE O ITEM PARA FILTRAR</string>
+    <string name="dish_deleted_successfully_message">Prato deletado com sucesso.</string>
+    <string name="dish_list_error_message">Um erro ocorreu ao buscar a lista de pratos.</string>
+    <string name="all_dishes_api_error_message">Erro na API de Todos os pratos</string>
+    <string name="all_dishes_loading_message">Buscando Todos os Pratos</string>
+    <string name="label_no_dishes_added_yet">Nenhum prato adicionado!!</string>
+
+    <!-- AddUpdateDishFragment -->
+    <string name="add_dish">Adicionar prato</string>
+    <string name="title_select_dish_type">SELECIONE O TIPO DE PRATO</string>
+    <string name="title_select_dish_category">SELECIONE A CATEGORIA DO PRATO</string>
+    <string name="err_msg_select_dish_image">Selecione a foto do prato.</string>
+    <string name="err_msg_enter_dish_title">Adicione o nome do prato.</string>
+    <string name="err_msg_select_dish_type">Selecione o tipo do prato.</string>
+    <string name="err_msg_select_dish_category">Selecione a categoria do prato.</string>
+    <string name="err_msg_enter_dish_ingredients">Adicione os ingredientes.</string>
+    <string name="err_msg_select_dish_cooking_time">Adicione o tempo de cozimento.</string>
+    <string name="err_msg_enter_dish_cooking_instructions">Adicione o modo de preparo.</string>
+    <string name="dish_details_added_successfully">Sucesso ao adicionar o prato.</string>
+    <string name="dish_details_updated_successfully">Sucesso ao atualizar o prato.</string>
+    <string name="storage_permission_denied_message">Você recusou a permissão de acesso ao armazenamento.</string>
+    <string name="permission_settings_message">Parece que você desativou a permissão necessária. Ela pode ser habilitada nas configurações do sistema</string>
+    <string name="permission_settings_positive_button">IR PARA AS CONFIGURAÇÕES</string>
+    <string name="lbl_update_dish">ATUALIZAR PRATO</string>
+    <string name="lbl_add_dish">ADICIONAR PRATO</string>
+    <string name="image_contentDescription">image</string>
+    <string name="lbl_title">Título</string>
+    <string name="lbl_type">Tipo</string>
+    <string name="lbl_category">Categoria</string>
+    <string name="lbl_ingredients">Ingredientes</string>
+    <string name="lbl_cooking_time_in_minutes">Tempo de cozimento em minutos</string>
+    <string name="lbl_direction_to_cook">Modo de preparo</string>
+    <string name="title_add_dish">Adicionar prato</string>
+    <string name="title_edit_dish">Editar prato</string>
+
+    <!-- FavoriteDishesFragment -->
+    <string name="title_favorite_dishes">Favoritos</string>
+    <string name="label_no_favorite_dishes_added_yet">Nenhum prato adicionado aos favoritos!</string>
+    <string name="favorite_dish_list_error_message">Um erro ocorreu ao buscar a lista de pratos favoritos.</string>
+    <string name="favorite_dish_api_error_message">Erro de API de Pratos Favoritos</string>
+    <string name="favorite_dishes_loading_message">Buscando pratos favoritos</string>
+
+    <!-- RandomDishFragment -->
+    <string name="title_random_dish">Prato aleatório</string>
+    <string name="msg_already_added_to_favorites">Você já adicionou o prato aos favoritos</string>
+    <string name="please_wait">Por favor, aguarde&#8230;</string>
+    <string name="category_other">Outro</string>
+    <string name="random_dish_api_error_message">Erro de API de Prato Aleatório</string>
+
+    <!-- DishDetailsFragment -->
+    <string name="lbl_estimate_cooking_time">O tempo aproximado de preparo é de %1$s minutos.</string>
+    <string name="action_share_dish">Compartilhar</string></resources>

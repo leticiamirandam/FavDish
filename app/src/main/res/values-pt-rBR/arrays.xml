@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="dish_types">
+        <item>café da manhã</item>
+        <item>almoço</item>
+        <item>snacks</item>
+        <item>jantar</item>
+        <item>salada</item>
+        <item>acompanhamento</item>
+        <item>sobremesa</item>
+        <item>outro</item>
+    </string-array>
+
+    <string-array name="dish_categories">
+        <item>Pizza</item>
+        <item>Churrasco</item>
+        <item>Confeitaria</item>
+        <item>Hamburguer</item>
+        <item>Café</item>
+        <item>Frango</item>
+        <item>Sobremesa</item>
+        <item>Bebidas</item>
+        <item>Hot Dogs</item>
+        <item>Sucos</item>
+        <item>Sanduíches</item>
+        <item>Chá &amp; Café</item>
+        <item>Wraps</item>
+        <item>Outros</item>
+    </string-array>
+</resources>

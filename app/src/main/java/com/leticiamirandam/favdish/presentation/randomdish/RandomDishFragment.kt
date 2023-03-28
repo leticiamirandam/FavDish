@@ -15,7 +15,6 @@ import com.bumptech.glide.Glide
 import com.leticiamirandam.favdish.R
 import com.leticiamirandam.favdish.databinding.FragmentRandomDishBinding
 import com.leticiamirandam.favdish.domain.model.FavDish
-import com.leticiamirandam.favdish.utils.Constants
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class RandomDishFragment : Fragment() {
@@ -24,7 +23,6 @@ class RandomDishFragment : Fragment() {
 
     private val mRandomDishViewModel: RandomDishViewModel by viewModel()
     private var addedToFavorites = false
-
     private var mProgressDialog: Dialog? = null
 
     override fun onCreateView(
@@ -38,9 +36,11 @@ class RandomDishFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mRandomDishViewModel.getRandomRecipeFromApi()
-        randomDishViewModelObserver()
+        addRandomDishViewModelObserver()
+        setupOnRefreshListener()
+    }
 
+    private fun setupOnRefreshListener() {
         mBinding.srlRandomDish.setOnRefreshListener {
             mRandomDishViewModel.getRandomRecipeFromApi()
         }
@@ -58,7 +58,7 @@ class RandomDishFragment : Fragment() {
         mProgressDialog?.dismiss()
     }
 
-    private fun randomDishViewModelObserver() {
+    private fun addRandomDishViewModelObserver() {
         mRandomDishViewModel.randomDishResponse.observe(viewLifecycleOwner) { randomDishResponse ->
             if (mBinding.srlRandomDish.isRefreshing)
                 mBinding.srlRandomDish.isRefreshing = false
@@ -68,12 +68,11 @@ class RandomDishFragment : Fragment() {
             dataError.let {
                 if (mBinding.srlRandomDish.isRefreshing)
                     mBinding.srlRandomDish.isRefreshing = false
-                Log.e("Random Dish API Error", "$dataError")
+                Log.e(getString(R.string.random_dish_api_error_message), "$dataError")
             }
         }
         mRandomDishViewModel.loadRandomDish.observe(viewLifecycleOwner) { loadRandomDish ->
             loadRandomDish.let {
-                Log.e("Random Dish Loading", "$loadRandomDish")
                 if (loadRandomDish && !mBinding.srlRandomDish.isRefreshing) {
                     showCustomProgressDialog()
                 } else {
@@ -90,7 +89,7 @@ class RandomDishFragment : Fragment() {
             .into(mBinding.ivDishImage)
         mBinding.tvTitle.text = favDish.title
         mBinding.tvType.text = favDish.type
-        mBinding.tvCategory.text = "Other"
+        mBinding.tvCategory.text = getString(R.string.category_other)
         mBinding.tvIngredients.text = favDish.ingredients
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             mBinding.tvCookingDirection.text = Html.fromHtml(
@@ -107,7 +106,6 @@ class RandomDishFragment : Fragment() {
                 R.drawable.ic_favorite_unselected
             )
         )
-
         mBinding.tvCookingTime.text =
             resources.getString(
                 R.string.lbl_estimate_cooking_time,
@@ -115,31 +113,15 @@ class RandomDishFragment : Fragment() {
             )
         mBinding.ivFavoriteDish.setOnClickListener {
             if (addedToFavorites) {
-                Toast.makeText(
-                    requireActivity(),
-                    resources.getString(R.string.msg_already_added_to_favorites),
-                    Toast.LENGTH_LONG
-                ).show()
+                showFeedbackToast(getString(R.string.msg_already_added_to_favorites))
             } else {
-                saveFavoriteDish(favDish)
+                mRandomDishViewModel.saveFavoriteDish(favDish)
+                showFavoriteDishSavedFeedback()
             }
         }
     }
 
-    private fun saveFavoriteDish(favDish: FavDish) {
-        val randomDishDetais = FavDish(
-            id = favDish.id,
-            image = favDish.image,
-            imageSource = Constants.DISH_IMAGE_SOURCE_ONLINE,
-            title = favDish.title,
-            type = favDish.type,
-            category = "Other",
-            ingredients = favDish.ingredients,
-            cookingTime = favDish.cookingTime,
-            directionToCook = favDish.directionToCook,
-            favoriteDish = true
-        )
-        mRandomDishViewModel.insert(randomDishDetais)
+    private fun showFavoriteDishSavedFeedback() {
         addedToFavorites = true
         mBinding.ivFavoriteDish.setImageDrawable(
             ContextCompat.getDrawable(
@@ -147,10 +129,10 @@ class RandomDishFragment : Fragment() {
                 R.drawable.ic_favorite_selected
             )
         )
-        Toast.makeText(
-            requireActivity(),
-            resources.getString(R.string.msg_added_to_favorites),
-            Toast.LENGTH_LONG
-        ).show()
+        showFeedbackToast(getString(R.string.msg_added_to_favorites))
+    }
+
+    private fun showFeedbackToast(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
     }
 }

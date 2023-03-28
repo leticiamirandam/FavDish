@@ -34,8 +34,7 @@ import java.util.*
 class DishDetailsFragment : Fragment() {
 
     private var mFavDishDetails: FavDish? = null
-
-    private var mBinding: FragmentDishDetailsBinding? = null
+    private lateinit var mBinding: FragmentDishDetailsBinding
     private val dishDetailsViewModel: DishDetailsViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,38 +50,42 @@ class DishDetailsFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_share_dish -> {
-                val type = "text/plain"
-                val subject = "Checkout this dish recipe"
-                var extraText = ""
-                val shareWith = "Share with"
-                mFavDishDetails?.let {
-                    var image = ""
-                    if (it.imageSource == Constants.DISH_IMAGE_SOURCE_ONLINE) {
-                        image = it.image
-                    }
-                    var cookingInstructions = ""
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        cookingInstructions = Html.fromHtml(
-                            it.directionToCook,
-                            Html.FROM_HTML_MODE_COMPACT
-                        ).toString()
-                    } else {
-                        cookingInstructions = Html.fromHtml(it.directionToCook).toString()
-                    }
-                    extraText =
-                        "$image \n" +
-                                "\n Title:  ${it.title} \n\n Type: ${it.type} \n\n Category: ${it.category}" +
-                                "\n\n Ingredients: \n ${it.ingredients} \n\n Instructions To Cook: \n $cookingInstructions" +
-                                "\n\n Time required to cook the dish approx ${it.cookingTime} minutes."
-                    val intent = Intent(Intent.ACTION_SEND)
-                    intent.type = type
-                    intent.putExtra(Intent.EXTRA_SUBJECT, subject)
-                    intent.putExtra(Intent.EXTRA_TEXT, extraText)
-                    startActivity(Intent.createChooser(intent, shareWith))
-                }
+                shareDish()
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun shareDish() {
+        val type = "text/plain"
+        val subject = "Checkout this dish recipe"
+        val shareWith = "Share with"
+        mFavDishDetails?.let {
+            val image = if (it.imageSource == Constants.DISH_IMAGE_SOURCE_ONLINE) {
+                it.image
+            } else {
+                ""
+            }
+            val cookingInstructions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                Html.fromHtml(
+                    it.directionToCook,
+                    Html.FROM_HTML_MODE_COMPACT
+                ).toString()
+            } else {
+                @Suppress("DEPRECATION")
+                Html.fromHtml(it.directionToCook).toString()
+            }
+            val extraText =
+                "$image \n" +
+                        "\n Title:  ${it.title} \n\n Type: ${it.type} \n\n Category: ${it.category}" +
+                        "\n\n Ingredients: \n ${it.ingredients} \n\n Instructions To Cook: \n $cookingInstructions" +
+                        "\n\n Time required to cook the dish approx ${it.cookingTime} minutes."
+            val intent = Intent(Intent.ACTION_SEND)
+            intent.type = type
+            intent.putExtra(Intent.EXTRA_SUBJECT, subject)
+            intent.putExtra(Intent.EXTRA_TEXT, extraText)
+            startActivity(Intent.createChooser(intent, shareWith))
+        }
     }
 
     override fun onCreateView(
@@ -90,115 +93,112 @@ class DishDetailsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         mBinding = FragmentDishDetailsBinding.inflate(inflater, container, false)
-        return mBinding!!.root
+        return mBinding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val args: DishDetailsFragmentArgs by navArgs()
         mFavDishDetails = args.dishDetails
-        args.let {
-            try {
-                Glide.with(requireActivity())
-                    .load(it.dishDetails.image)
-                    .centerCrop()
-                    .listener(object : RequestListener<Drawable> {
-                        override fun onLoadFailed(
-                            e: GlideException?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            Log.e("TAG", "ERROR loading image", e)
-                            return false
-                        }
+        setupDishInfo(args)
+        setupFavoriteOnClickListener(args)
+    }
 
-                        override fun onResourceReady(
-                            resource: Drawable?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            dataSource: DataSource?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            resource.let {
-                                Palette.from(resource!!.toBitmap()).generate { palette ->
-                                    val intColor = palette?.lightVibrantSwatch?.rgb ?: 0
-                                    mBinding!!.rlDishDetailMain.setBackgroundColor(intColor)
-                                }
+    private fun setupDishInfo(args: DishDetailsFragmentArgs) {
+        try {
+            Glide.with(requireActivity())
+                .load(args.dishDetails.image)
+                .centerCrop()
+                .listener(object : RequestListener<Drawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        Log.e("TAG", "ERROR loading image", e)
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: Drawable?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        resource.let {
+                            Palette.from(resource!!.toBitmap()).generate { palette ->
+                                val intColor = palette?.lightVibrantSwatch?.rgb ?: 0
+                                mBinding.rlDishDetailMain.setBackgroundColor(intColor)
                             }
-                            return false
                         }
-                    })
-                    .into(mBinding!!.ivDishImage)
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-            mBinding!!.tvTitle.text = it.dishDetails.title
-            mBinding!!.tvType.text = it.dishDetails.type.capitalize(Locale.ROOT)
-            mBinding!!.tvCategory.text = it.dishDetails.category
-            mBinding!!.tvIngredients.text = it.dishDetails.ingredients
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                mBinding!!.tvCookingDirection.text = Html.fromHtml(
-                    it.dishDetails.directionToCook,
-                    Html.FROM_HTML_MODE_COMPACT
-                )
-            } else {
-                @Suppress("DEPRECATION")
-                mBinding!!.tvCookingDirection.text = Html.fromHtml(it.dishDetails.directionToCook)
-            }
-            mBinding!!.tvCookingTime.text = resources.getString(
-                R.string.lbl_estimate_cooking_time,
-                it.dishDetails.cookingTime
-            )
-            if (args.dishDetails.favoriteDish) {
-                mBinding!!.ivFavoriteDish.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        requireActivity(),
-                        R.drawable.ic_favorite_selected
-                    )
-                )
-            } else {
-                mBinding!!.ivFavoriteDish.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        requireActivity(),
-                        R.drawable.ic_favorite_unselected
-                    )
-                )
-            }
+                        return false
+                    }
+                })
+                .into(mBinding.ivDishImage)
+        } catch (e: IOException) {
+            Log.i("Error: ", e.stackTraceToString())
         }
-        mBinding!!.ivFavoriteDish.setOnClickListener {
+        mBinding.tvTitle.text = args.dishDetails.title
+        mBinding.tvType.text = args.dishDetails.type.replaceFirstChar { it.titlecase(Locale.ROOT) }
+        mBinding.tvCategory.text = args.dishDetails.category
+        mBinding.tvIngredients.text = args.dishDetails.ingredients
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            mBinding.tvCookingDirection.text = Html.fromHtml(
+                args.dishDetails.directionToCook,
+                Html.FROM_HTML_MODE_COMPACT
+            )
+        } else {
+            @Suppress("DEPRECATION")
+            mBinding.tvCookingDirection.text = Html.fromHtml(args.dishDetails.directionToCook)
+        }
+        mBinding.tvCookingTime.text = resources.getString(
+            R.string.lbl_estimate_cooking_time,
+            args.dishDetails.cookingTime
+        )
+        if (args.dishDetails.favoriteDish) {
+            mBinding.ivFavoriteDish.setImageDrawable(
+                ContextCompat.getDrawable(
+                    requireActivity(),
+                    R.drawable.ic_favorite_selected
+                )
+            )
+        } else {
+            mBinding.ivFavoriteDish.setImageDrawable(
+                ContextCompat.getDrawable(
+                    requireActivity(),
+                    R.drawable.ic_favorite_unselected
+                )
+            )
+        }
+    }
+
+    private fun setupFavoriteOnClickListener(args: DishDetailsFragmentArgs) {
+        mBinding.ivFavoriteDish.setOnClickListener {
             args.dishDetails.favoriteDish = !args.dishDetails.favoriteDish
             dishDetailsViewModel.update(args.dishDetails)
             if (args.dishDetails.favoriteDish) {
-                mBinding!!.ivFavoriteDish.setImageDrawable(
+                mBinding.ivFavoriteDish.setImageDrawable(
                     ContextCompat.getDrawable(
                         requireActivity(),
                         R.drawable.ic_favorite_selected
                     )
                 )
-                Toast.makeText(
-                    requireActivity(),
-                    resources.getString(R.string.msg_added_to_favorites),
-                    Toast.LENGTH_LONG
-                ).show()
+                showFeedbackToast(getString(R.string.msg_added_to_favorites))
             } else {
-                mBinding!!.ivFavoriteDish.setImageDrawable(
+                mBinding.ivFavoriteDish.setImageDrawable(
                     ContextCompat.getDrawable(
                         requireActivity(),
                         R.drawable.ic_favorite_unselected
                     )
                 )
-                Toast.makeText(
-                    requireActivity(),
-                    resources.getString(R.string.msg_removed_from_favorites),
-                    Toast.LENGTH_LONG
-                ).show()
+                showFeedbackToast(getString(R.string.msg_removed_from_favorites))
             }
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        mBinding = null
+    private fun showFeedbackToast(message: String) {
+        Toast.makeText(requireActivity(), message, Toast.LENGTH_LONG).show()
     }
 }

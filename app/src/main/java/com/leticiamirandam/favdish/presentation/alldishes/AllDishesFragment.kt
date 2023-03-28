@@ -51,10 +51,14 @@ class AllDishesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupRecyclerView()
+        addAllDishesViewModelObserver()
+    }
+
+    private fun setupRecyclerView() {
         mBinding.rvDishesList.layoutManager = GridLayoutManager(requireActivity(), 2)
         mFavDishAdapter = FavDishAdapter(this@AllDishesFragment)
         mBinding.rvDishesList.adapter = mFavDishAdapter
-        allDishesViewModelObserver()
     }
 
     override fun onStart() {
@@ -62,7 +66,7 @@ class AllDishesFragment : Fragment() {
         allDishesViewModel.getAllDishes()
     }
 
-    private fun allDishesViewModelObserver() {
+    private fun addAllDishesViewModelObserver() {
         allDishesViewModel.allDishesListResponse.observe(viewLifecycleOwner) { allDishes ->
             allDishes.let {
                 if (it.isNotEmpty()) {
@@ -78,31 +82,24 @@ class AllDishesFragment : Fragment() {
         allDishesViewModel.deleteDishResponse.observe(viewLifecycleOwner) { deletedDish ->
             deletedDish.let {
                 if (deletedDish) {
-                    Toast.makeText(
-                        context,
-                        "Dish deleted successfully.",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    Log.e("Favorite Dish API Error", "$deletedDish")
+                    showFeedbackToast(getString(R.string.dish_deleted_successfully_message))
                     allDishesViewModel.getAllDishes()
+                } else {
+                    Log.e(getString(R.string.all_dishes_api_error_message), "$deletedDish")
                 }
             }
         }
         allDishesViewModel.allDishesLoadingError.observe(viewLifecycleOwner) { dataError ->
             dataError.let {
                 if (dataError) {
-                    Toast.makeText(
-                        context,
-                        "An error has ocurred while trying to get the dishes list.",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    Log.e("Favorite Dish API Error", "$dataError")
+                    showFeedbackToast(getString(R.string.dish_list_error_message))
+                    Log.e(getString(R.string.all_dishes_api_error_message), "$dataError")
                 }
             }
         }
         allDishesViewModel.loadAllDishes.observe(viewLifecycleOwner) { loadFavoriteDishes ->
             loadFavoriteDishes.let {
-                Log.e("Favorite Dishes Loading", "$loadFavoriteDishes")
+                Log.e(getString(R.string.favorite_dishes_loading_message), "$loadFavoriteDishes")
                 if (loadFavoriteDishes) {
                     showCustomProgressDialog()
                 } else {
@@ -111,7 +108,6 @@ class AllDishesFragment : Fragment() {
             }
         }
     }
-
 
     private fun showCustomProgressDialog() {
         mProgressDialog = Dialog(requireActivity())
@@ -122,9 +118,7 @@ class AllDishesFragment : Fragment() {
     }
 
     private fun hideProgressDialog() {
-        mProgressDialog?.let {
-            it.dismiss()
-        }
+        mProgressDialog?.dismiss()
     }
 
     fun dishDetails(favDish: FavDish) {
@@ -206,5 +200,9 @@ class AllDishesFragment : Fragment() {
         } else {
             allDishesViewModel.getFilteredList(filterItemSelection)
         }
+    }
+
+    private fun showFeedbackToast(message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
     }
 }

@@ -7,6 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
@@ -51,12 +53,12 @@ class FavoriteDishesFragment : Fragment() {
         mFavDishViewModel.favoriteDishesListResponse.observe(viewLifecycleOwner) { favoriteDishesResponse ->
             favoriteDishesResponse.let {
                 if (it.isNotEmpty()) {
-                    mBinding.rvFavoriteDishesList.visibility = View.VISIBLE
-                    mBinding.tvNoFavoriteDishesAddedYet.visibility = View.GONE
+                    mBinding.rvFavoriteDishesList.isVisible = true
+                    mBinding.tvNoFavoriteDishesAddedYet.isGone = true
                     favDishAdapter.dishesList(it)
                 } else {
-                    mBinding.rvFavoriteDishesList.visibility = View.GONE
-                    mBinding.tvNoFavoriteDishesAddedYet.visibility = View.VISIBLE
+                    mBinding.rvFavoriteDishesList.isGone = true
+                    mBinding.tvNoFavoriteDishesAddedYet.isVisible = true
                 }
             }
         }
@@ -65,16 +67,16 @@ class FavoriteDishesFragment : Fragment() {
                 if (dataError) {
                     Toast.makeText(
                         context,
-                        "An error has ocurred while trying to get the favorite dishes list.",
+                        R.string.favorite_dish_list_error_message,
                         Toast.LENGTH_LONG
                     ).show()
-                    Log.e("Favorite Dish API Error", "$dataError")
+                    Log.e(getString(R.string.favorite_dish_api_error_message), "$dataError")
                 }
             }
         }
         mFavDishViewModel.loadFavoriteDishes.observe(viewLifecycleOwner) { loadFavoriteDishes ->
             loadFavoriteDishes.let {
-                Log.e("Favorite Dishes Loading", "$loadFavoriteDishes")
+                Log.e(getString(R.string.favorite_dishes_loading_message), "$loadFavoriteDishes")
                 if (loadFavoriteDishes) {
                     showCustomProgressDialog()
                 } else {
@@ -93,9 +95,7 @@ class FavoriteDishesFragment : Fragment() {
     }
 
     private fun hideProgressDialog() {
-        mProgressDialog?.let {
-            it.dismiss()
-        }
+        mProgressDialog?.dismiss()
     }
 
     fun dishDetails(favDish: FavDish) {
