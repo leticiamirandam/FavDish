@@ -48,8 +48,8 @@ dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.3.2'
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'com.google.android.material:material:1.2.1'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.8.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
     // SDP - A scalable size unit library
@@ -106,4 +106,7 @@ dependencies {
 
     //Kotlin serialization
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1"
+
+    // Preference manager
+    implementation "androidx.preference:preference-ktx:1.2.0"
 }

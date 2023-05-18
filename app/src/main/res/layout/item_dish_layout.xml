@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="@dimen/_5sdp"
+    app:cardCornerRadius="@dimen/_10sdp"
     app:cardElevation="@dimen/_5sdp"
     app:cardUseCompatPadding="true">
 
@@ -43,10 +43,10 @@
             android:id="@+id/tv_dish_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/_10sdp"
+            android:layout_margin="@dimen/_8sdp"
             android:gravity="center_vertical"
-            android:textColor="@color/grey_900"
-            android:textSize="@dimen/_16sdp"
+            android:textColor="@color/item_custom_list_text_color"
+            android:textSize="@dimen/_14sdp"
             android:textStyle="bold"
             tools:text="Dish title" />
     </LinearLayout>

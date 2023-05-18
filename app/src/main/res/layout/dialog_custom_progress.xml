@@ -15,6 +15,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/please_wait"
-        android:textColor="@color/grey_900"
+        android:textColor="@color/item_custom_list_text_color"
         android:textSize="@dimen/_16sdp" />
 </LinearLayout>

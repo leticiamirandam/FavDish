@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/title_select_image_action"
-        android:textColor="@color/grey_900"
+        android:textColor="@color/item_custom_list_text_color"
         android:textSize="@dimen/_16sdp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@id/tv_camera"

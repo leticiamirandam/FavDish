@@ -77,7 +77,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="text"
-                    android:textColor="@color/grey_900"
+                    android:textColor="@color/item_custom_list_text_color"
                     android:textSize="@dimen/_15sdp" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -102,7 +102,7 @@
                     android:focusable="false"
                     android:focusableInTouchMode="false"
                     android:inputType="text"
-                    android:textColor="@color/grey_900"
+                    android:textColor="@color/item_custom_list_text_color"
                     android:textSize="@dimen/_15sdp" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -127,7 +127,7 @@
                     android:focusable="false"
                     android:focusableInTouchMode="false"
                     android:inputType="text"
-                    android:textColor="@color/grey_900"
+                    android:textColor="@color/item_custom_list_text_color"
                     android:textSize="@dimen/_15sdp" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -152,7 +152,7 @@
                     android:gravity="top"
                     android:inputType="textMultiLine"
                     android:minLines="5"
-                    android:textColor="@color/grey_900"
+                    android:textColor="@color/item_custom_list_text_color"
                     android:textSize="@dimen/_15sdp" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -176,7 +176,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="top"
                     android:inputType="number"
-                    android:textColor="@color/grey_900"
+                    android:textColor="@color/item_custom_list_text_color"
                     android:textSize="@dimen/_15sdp"
                     android:imeOptions="actionNext"
                     android:nextFocusDown="@id/til_direction_to_cook" />
@@ -203,11 +203,12 @@
                     android:gravity="top"
                     android:inputType="textMultiLine"
                     android:minLines="5"
-                    android:textColor="@color/grey_900"
+                    android:textColor="@color/item_custom_list_text_color"
                     android:textSize="@dimen/_15sdp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <Button
+                style="@style/Widget.Material3.Button"
                 android:id="@+id/btn_add_dish"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -216,10 +217,9 @@
                 android:layout_marginTop="@dimen/_20sdp"
                 android:layout_marginEnd="@dimen/_16sdp"
                 android:layout_marginBottom="@dimen/_20sdp"
-                android:foreground="?attr/selectableItemBackground"
-                android:gravity="center"
                 android:text="@string/lbl_add_dish"
-                android:textColor="@color/secondary_light_color"
+                android:textSize="@dimen/_14sdp"
+                android:textColor="@color/button_text_color"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

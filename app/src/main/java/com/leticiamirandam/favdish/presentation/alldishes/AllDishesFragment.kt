@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
+import android.transition.TransitionInflater
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
@@ -12,7 +13,9 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -29,11 +32,11 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class AllDishesFragment : Fragment() {
 
-    private lateinit var mBinding: FragmentAllDishesBinding
-    private lateinit var mFavDishAdapter: FavDishAdapter
-    private lateinit var mCustomListDialog: Dialog
+    private lateinit var binding: FragmentAllDishesBinding
+    private lateinit var favDishAdapter: FavDishAdapter
+    private lateinit var customListDialog: Dialog
     private val allDishesViewModel: AllDishesViewModel by viewModel()
-    private var mProgressDialog: Dialog? = null
+    private var progressDialog: Dialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,20 +48,30 @@ class AllDishesFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        mBinding = FragmentAllDishesBinding.inflate(inflater, container, false)
-        return mBinding.root
+        binding = FragmentAllDishesBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
-        addAllDishesViewModelObserver()
+        addDishesListObserver()
+        addErrorObserver()
+        addDeleteDishObserver()
+        addLoadingObserver()
     }
 
     private fun setupRecyclerView() {
-        mBinding.rvDishesList.layoutManager = GridLayoutManager(requireActivity(), 2)
-        mFavDishAdapter = FavDishAdapter(this@AllDishesFragment)
-        mBinding.rvDishesList.adapter = mFavDishAdapter
+        binding.rvDishesList.layoutManager = GridLayoutManager(requireActivity(), 2)
+        favDishAdapter = FavDishAdapter(this@AllDishesFragment)
+        binding.rvDishesList.apply {
+            adapter = favDishAdapter
+            postponeEnterTransition()
+            viewTreeObserver.addOnPreDrawListener {
+                startPostponedEnterTransition()
+                true
+            }
+        }
     }
 
     override fun onStart() {
@@ -66,19 +79,33 @@ class AllDishesFragment : Fragment() {
         allDishesViewModel.getAllDishes()
     }
 
-    private fun addAllDishesViewModelObserver() {
+    private fun addDishesListObserver() {
         allDishesViewModel.allDishesListResponse.observe(viewLifecycleOwner) { allDishes ->
             allDishes.let {
                 if (it.isNotEmpty()) {
-                    mBinding.rvDishesList.visibility = View.VISIBLE
-                    mBinding.tvNoDishesAddedYet.visibility = View.GONE
-                    mFavDishAdapter.dishesList(it)
+                    binding.rvDishesList.isVisible = true
+                    binding.tvNoDishesAddedYet.visibility = View.GONE
+                    favDishAdapter.dishesList(it)
                 } else {
-                    mBinding.rvDishesList.visibility = View.GONE
-                    mBinding.tvNoDishesAddedYet.visibility = View.VISIBLE
+                    binding.rvDishesList.isVisible = false
+                    binding.tvNoDishesAddedYet.isVisible = true
                 }
             }
         }
+    }
+
+    private fun addErrorObserver() {
+        allDishesViewModel.allDishesLoadingError.observe(viewLifecycleOwner) { dataError ->
+            dataError.let {
+                if (dataError) {
+                    showFeedbackToast(getString(R.string.dish_list_error_message))
+                    Log.e(getString(R.string.all_dishes_api_error_message), "$dataError")
+                }
+            }
+        }
+    }
+
+    private fun addDeleteDishObserver() {
         allDishesViewModel.deleteDishResponse.observe(viewLifecycleOwner) { deletedDish ->
             deletedDish.let {
                 if (deletedDish) {
@@ -89,19 +116,14 @@ class AllDishesFragment : Fragment() {
                 }
             }
         }
-        allDishesViewModel.allDishesLoadingError.observe(viewLifecycleOwner) { dataError ->
-            dataError.let {
-                if (dataError) {
-                    showFeedbackToast(getString(R.string.dish_list_error_message))
-                    Log.e(getString(R.string.all_dishes_api_error_message), "$dataError")
-                }
-            }
-        }
+    }
+
+    private fun addLoadingObserver() {
         allDishesViewModel.loadAllDishes.observe(viewLifecycleOwner) { loadFavoriteDishes ->
             loadFavoriteDishes.let {
                 Log.e(getString(R.string.favorite_dishes_loading_message), "$loadFavoriteDishes")
                 if (loadFavoriteDishes) {
-                    showCustomProgressDialog()
+                    showProgressDialog()
                 } else {
                     hideProgressDialog()
                 }
@@ -109,30 +131,28 @@ class AllDishesFragment : Fragment() {
         }
     }
 
-    private fun showCustomProgressDialog() {
-        mProgressDialog = Dialog(requireActivity())
-        mProgressDialog?.let {
+    private fun showProgressDialog() {
+        progressDialog = Dialog(requireActivity())
+        progressDialog?.let {
             it.setContentView(R.layout.dialog_custom_progress)
             it.show()
         }
     }
 
     private fun hideProgressDialog() {
-        mProgressDialog?.dismiss()
+        progressDialog?.dismiss()
     }
 
-    fun dishDetails(favDish: FavDish) {
+    fun dishDetails(favDish: FavDish, extras: FragmentNavigator.Extras) {
         findNavController().navigate(
-            AllDishesFragmentDirections.actionAllDishesToDishDetails(
-                favDish
-            )
+            AllDishesFragmentDirections.actionAllDishesToDishDetails(favDish), extras
         )
         if (requireActivity() is MainActivity) {
             (activity as MainActivity?)!!.hideBottomNavigationView()
         }
     }
 
-    fun deleteDish(dish: FavDish) {
+    fun showDeleteDishDialog(dish: FavDish) {
         val builder = AlertDialog.Builder(requireActivity())
         builder.setTitle(resources.getString(R.string.title_delete_dish))
         builder.setMessage(resources.getString(R.string.msg_delete_dish_dialog, dish.title))
@@ -149,10 +169,10 @@ class AllDishesFragment : Fragment() {
         alertDialog.show()
     }
 
-    private fun filterDishesListDialog() {
-        mCustomListDialog = Dialog(requireActivity())
+    private fun showFilterDishesListDialog() {
+        customListDialog = Dialog(requireActivity())
         val binding: DialogCustomListBinding = DialogCustomListBinding.inflate(layoutInflater)
-        mCustomListDialog.setContentView(binding.root)
+        customListDialog.setContentView(binding.root)
         binding.tvTitle.text = resources.getString(R.string.title_select_item_to_filter)
         val dishTypes = resources.getStringArray(R.array.dish_types).toMutableList()
         dishTypes.add(0, Constants.ALL_ITEMS)
@@ -164,7 +184,7 @@ class AllDishesFragment : Fragment() {
             Constants.FILTER_SELECTION
         )
         binding.rvList.adapter = adapter
-        mCustomListDialog.show()
+        customListDialog.show()
     }
 
     override fun onResume() {
@@ -183,18 +203,16 @@ class AllDishesFragment : Fragment() {
         when (item.itemId) {
             R.id.action_add_dish -> {
                 startActivity(Intent(requireActivity(), AddUpdateDishActivity::class.java))
-                return true
             }
             R.id.action_filter_dishes -> {
-                filterDishesListDialog()
-                return true
+                showFilterDishesListDialog()
             }
         }
         return super.onOptionsItemSelected(item)
     }
 
     fun filterSelection(filterItemSelection: String) {
-        mCustomListDialog.dismiss()
+        customListDialog.dismiss()
         if (filterItemSelection == Constants.ALL_ITEMS) {
             allDishesViewModel.getAllDishes()
         } else {

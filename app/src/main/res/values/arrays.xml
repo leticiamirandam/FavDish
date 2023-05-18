@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="dish_types">
-        <item>breakfast</item>
-        <item>lunch</item>
-        <item>snacks</item>
-        <item>dinner</item>
-        <item>salad</item>
-        <item>side dish</item>
-        <item>dessert</item>
-        <item>other</item>
+        <item>Breakfast</item>
+        <item>Lunch</item>
+        <item>Snacks</item>
+        <item>Dinner</item>
+        <item>Salad</item>
+        <item>Side dish</item>
+        <item>Dessert</item>
+        <item>Other</item>
     </string-array>
 
     <string-array name="dish_categories">

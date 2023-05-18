@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="dish_types">
-        <item>café da manhã</item>
-        <item>almoço</item>
-        <item>snacks</item>
-        <item>jantar</item>
-        <item>salada</item>
-        <item>acompanhamento</item>
-        <item>sobremesa</item>
-        <item>outro</item>
+        <item>Café da manhã</item>
+        <item>Almoço</item>
+        <item>Snacks</item>
+        <item>Jantar</item>
+        <item>Salada</item>
+        <item>Acompanhamento</item>
+        <item>Sobremesa</item>
+        <item>Outro</item>
     </string-array>
 
     <string-array name="dish_categories">

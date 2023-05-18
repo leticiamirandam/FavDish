@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.leticiamirandam.favdish.R
@@ -21,48 +22,59 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class FavoriteDishesFragment : Fragment() {
 
-    private lateinit var mBinding: FragmentFavoriteDishesBinding
+    private lateinit var binding: FragmentFavoriteDishesBinding
 
-    private val mFavDishViewModel: FavoriteDishesViewModel by viewModel()
+    private val favDishViewModel: FavoriteDishesViewModel by viewModel()
     private lateinit var favDishAdapter: FavDishAdapter
-    private var mProgressDialog: Dialog? = null
+    private var progressDialog: Dialog? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        mBinding = FragmentFavoriteDishesBinding.inflate(inflater, container, false)
-        return mBinding.root
+        binding = FragmentFavoriteDishesBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mBinding.rvFavoriteDishesList.layoutManager = GridLayoutManager(requireActivity(), 2)
-        favDishAdapter = FavDishAdapter(this@FavoriteDishesFragment)
-        mBinding.rvFavoriteDishesList.adapter = favDishAdapter
+        setupRecyclerView()
         favoriteDishesViewModelObserver()
     }
 
     override fun onStart() {
         super.onStart()
-        mFavDishViewModel.getFavoriteDishes()
+        favDishViewModel.getFavoriteDishes()
+    }
+
+    private fun setupRecyclerView() {
+        binding.rvFavoriteDishesList.layoutManager = GridLayoutManager(requireActivity(), 2)
+        favDishAdapter = FavDishAdapter(this@FavoriteDishesFragment)
+        binding.rvFavoriteDishesList.apply {
+            adapter = favDishAdapter
+            postponeEnterTransition()
+            viewTreeObserver.addOnPreDrawListener {
+                startPostponedEnterTransition()
+                true
+            }
+        }
     }
 
     private fun favoriteDishesViewModelObserver() {
-        mFavDishViewModel.favoriteDishesListResponse.observe(viewLifecycleOwner) { favoriteDishesResponse ->
+        favDishViewModel.favoriteDishesListResponse.observe(viewLifecycleOwner) { favoriteDishesResponse ->
             favoriteDishesResponse.let {
                 if (it.isNotEmpty()) {
-                    mBinding.rvFavoriteDishesList.isVisible = true
-                    mBinding.tvNoFavoriteDishesAddedYet.isGone = true
+                    binding.rvFavoriteDishesList.isVisible = true
+                    binding.tvNoFavoriteDishesAddedYet.isGone = true
                     favDishAdapter.dishesList(it)
                 } else {
-                    mBinding.rvFavoriteDishesList.isGone = true
-                    mBinding.tvNoFavoriteDishesAddedYet.isVisible = true
+                    binding.rvFavoriteDishesList.isGone = true
+                    binding.tvNoFavoriteDishesAddedYet.isVisible = true
                 }
             }
         }
-        mFavDishViewModel.favoriteDishesLoadingError.observe(viewLifecycleOwner) { dataError ->
+        favDishViewModel.favoriteDishesLoadingError.observe(viewLifecycleOwner) { dataError ->
             dataError.let {
                 if (dataError) {
                     Toast.makeText(
@@ -74,7 +86,7 @@ class FavoriteDishesFragment : Fragment() {
                 }
             }
         }
-        mFavDishViewModel.loadFavoriteDishes.observe(viewLifecycleOwner) { loadFavoriteDishes ->
+        favDishViewModel.loadFavoriteDishes.observe(viewLifecycleOwner) { loadFavoriteDishes ->
             loadFavoriteDishes.let {
                 Log.e(getString(R.string.favorite_dishes_loading_message), "$loadFavoriteDishes")
                 if (loadFavoriteDishes) {
@@ -87,22 +99,23 @@ class FavoriteDishesFragment : Fragment() {
     }
 
     private fun showCustomProgressDialog() {
-        mProgressDialog = Dialog(requireActivity())
-        mProgressDialog?.let {
+        progressDialog = Dialog(requireActivity())
+        progressDialog?.let {
             it.setContentView(R.layout.dialog_custom_progress)
             it.show()
         }
     }
 
     private fun hideProgressDialog() {
-        mProgressDialog?.dismiss()
+        progressDialog?.dismiss()
     }
 
-    fun dishDetails(favDish: FavDish) {
+    fun dishDetails(favDish: FavDish, extras: FragmentNavigator.Extras) {
         findNavController().navigate(
             FavoriteDishesFragmentDirections.actionFavoriteDishesToDishDetails(
                 favDish
-            )
+            ),
+            extras
         )
         if (requireActivity() is MainActivity) {
             (activity as MainActivity?)!!.hideBottomNavigationView()

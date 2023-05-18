@@ -4,7 +4,10 @@
     package="com.leticiamirandam.favdish">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
@@ -36,9 +39,29 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".presentation.FullscreenActivity"
+            android:showOnLockScreen="true"
+            android:exported="true"/>
         <activity
             android:name="com.leticiamirandam.favdish.presentation.MainActivity"
             android:exported="true" />
+
+        <receiver
+            android:name=".utils.TimerExpiredReceiver"
+            android:enabled="true"
+            android:exported="false" />
+
+        <receiver
+            android:name=".utils.TimerNotificationActionReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="stop" />
+                <action android:name="pause" />
+                <action android:name="resume" />
+                <action android:name="start" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

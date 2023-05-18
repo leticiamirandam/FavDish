@@ -13,8 +13,8 @@
     <string name="title_select_image_action">Select Image Action</string>
 
     <!-- FavDishAdapter -->
-    <string name="action_edit_dish">EDIT DISH</string>
-    <string name="action_delete_dish">DELETE DISH</string>
+    <string name="action_edit_dish">Edit dish</string>
+    <string name="action_delete_dish">Delete dish</string>
 
     <!-- AllDishesFragment -->
     <string name="title_all_dishes">All Dishes</string>
@@ -23,7 +23,7 @@
     <string name="lbl_yes">Yes</string>
     <string name="lbl_no">No</string>
     <string name="action_filter_dishes">Filter Dishes</string>
-    <string name="title_select_item_to_filter">SELECT ITEM TO FILTER</string>
+    <string name="title_select_item_to_filter">Select item to filter</string>
     <string name="dish_deleted_successfully_message">Dish deleted successfully.</string>
     <string name="dish_list_error_message">An error has occurred while trying to get the dishes list.</string>
     <string name="all_dishes_api_error_message">All Dishes API Error</string>
@@ -32,8 +32,8 @@
 
     <!-- AddUpdateDishFragment -->
     <string name="add_dish">Add Dish</string>
-    <string name="title_select_dish_type">SELECT DISH TYPE</string>
-    <string name="title_select_dish_category">SELECT DISH CATEGORY</string>
+    <string name="title_select_dish_type">Select the dish type</string>
+    <string name="title_select_dish_category">Select the dish category</string>
     <string name="err_msg_select_dish_image">Select dish image.</string>
     <string name="err_msg_enter_dish_title">Enter dish title.</string>
     <string name="err_msg_select_dish_type">Select dish type.</string>
@@ -46,8 +46,8 @@
     <string name="storage_permission_denied_message">You have denied the storage permission to select image.</string>
     <string name="permission_settings_message">It Looks like you have turned off permissions required for this feature. It can be enabled under Application Settings</string>
     <string name="permission_settings_positive_button">GO TO SETTINGS</string>
-    <string name="lbl_update_dish">UPDATE DISH</string>
-    <string name="lbl_add_dish">ADD DISH</string>
+    <string name="lbl_update_dish">Update dish</string>
+    <string name="lbl_add_dish">Add dish</string>
     <string name="image_contentDescription">image</string>
     <string name="lbl_title">Title</string>
     <string name="lbl_type">Type</string>
@@ -75,4 +75,5 @@
     <!-- DishDetailsFragment -->
     <string name="lbl_estimate_cooking_time">The approx time required to cook the dish is %1$s minutes.</string>
     <string name="action_share_dish">Share Dish</string>
+    <string name="add_timer">Add timer</string>
 </resources>

@@ -3,6 +3,7 @@ package com.leticiamirandam.favdish.presentation.common.adapters
 import android.app.Activity
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.leticiamirandam.favdish.databinding.ItemCustomListBinding
@@ -18,6 +19,7 @@ class CustomListItemAdapter(
 
     class ViewHolder(view: ItemCustomListBinding) : RecyclerView.ViewHolder(view.root) {
         val tvText = view.tvText
+        val divider = view.divider
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -29,8 +31,10 @@ class CustomListItemAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = listItems[position]
         holder.tvText.text = item
+        if (position == itemCount - 1)
+            holder.divider.isVisible = false
         holder.itemView.setOnClickListener {
-            if(activity is AddUpdateDishActivity) {
+            if (activity is AddUpdateDishActivity) {
                 activity.selectedListItem(item, selection)
             }
             if (fragment is AllDishesFragment) {

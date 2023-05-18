@@ -10,14 +10,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackground"
-        android:gravity="center"
+        android:gravity="start"
         android:padding="@dimen/_10sdp"
-        android:textAllCaps="true"
-        android:textColor="@color/grey_900"
+        android:textColor="@color/item_custom_list_text_color"
         android:textSize="@dimen/_16sdp"
         tools:text="Item Value" />
 
     <View
+        android:id="@+id/divider"
         android:layout_width="match_parent"
         android:layout_height="@dimen/_1sdp"
         android:background="@color/divider_line_color"/>

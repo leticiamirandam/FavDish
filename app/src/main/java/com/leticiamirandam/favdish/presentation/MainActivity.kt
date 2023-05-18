@@ -1,5 +1,9 @@
 package com.leticiamirandam.favdish.presentation
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -9,31 +13,27 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import androidx.work.Constraints
-import androidx.work.Data
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequest
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
 import com.leticiamirandam.favdish.R
 import com.leticiamirandam.favdish.databinding.ActivityMainBinding
-import com.leticiamirandam.favdish.notification.NotifyWorker
-import com.leticiamirandam.favdish.notification.OneTimeRequestWorker
-import com.leticiamirandam.favdish.utils.Constants
-import java.util.concurrent.TimeUnit
+import com.leticiamirandam.favdish.utils.PrefUtil
+import com.leticiamirandam.favdish.utils.TimerExpiredReceiver
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var mBinding: ActivityMainBinding
-    private lateinit var mNavController: NavController
+    enum class TimerState{
+        Stopped, Paused, Running
+    }
+
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mBinding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(mBinding.root)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        mNavController = findNavController(R.id.nav_host_fragment)
+        navController = findNavController(R.id.nav_host_fragment)
 
         val appBarConfiguration = AppBarConfiguration(
             setOf(
@@ -42,62 +42,47 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_random_dish
             )
         )
-        setupActionBarWithNavController(mNavController, appBarConfiguration)
-        mBinding.navView.setupWithNavController(mNavController)
-        if(intent.hasExtra(Constants.NOTIFICATION_ID)) {
-            val notificationId = intent.getIntExtra(Constants.NOTIFICATION_ID, 0)
-            mBinding.navView.selectedItemId = R.id.navigation_random_dish
-        }
-        startWork()
-    }
-
-    private fun createConstraints() = Constraints.Builder()
-        .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
-        .setRequiresCharging(false)
-        .setRequiresBatteryNotLow(true)
-        .build()
-
-    private fun createTimerWorkRequest(): OneTimeWorkRequest {
-        val timer = Data.Builder()
-        timer.putInt("timer", 5)
-        return OneTimeWorkRequest.Builder(OneTimeRequestWorker::class.java)
-            .setInitialDelay(2, TimeUnit.MINUTES)
-            .setInputData(timer.build())
-            .setConstraints(createConstraints())
-            .build()
-    }
-
-    private fun createWorkRequest() = PeriodicWorkRequestBuilder<NotifyWorker>(15, TimeUnit.MINUTES)
-        .setConstraints(createConstraints())
-        .build()
-
-
-    private fun startOneTimeWork() {
-        WorkManager.getInstance(this).enqueue(createTimerWorkRequest())
-    }
-
-    private fun startWork() {
-        WorkManager.getInstance(this)
-            .enqueueUniquePeriodicWork(
-                "FavDish Notify Work",
-                ExistingPeriodicWorkPolicy.KEEP,
-                createWorkRequest()
-            )
+        setupActionBarWithNavController(navController, appBarConfiguration)
+        binding.navView.setupWithNavController(navController)
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        return NavigationUI.navigateUp(mNavController, null)
+        return NavigationUI.navigateUp(navController, null)
     }
 
     fun hideBottomNavigationView() {
-        mBinding.navView.clearAnimation()
-        mBinding.navView.animate().translationY(mBinding.navView.height.toFloat()).duration = 300
-        mBinding.navView.visibility = View.GONE
+        binding.navView.clearAnimation()
+        binding.navView.animate().translationY(binding.navView.height.toFloat()).duration = 300
+        binding.navView.visibility = View.GONE
     }
 
     fun showBottomNavigationView() {
-        mBinding.navView.clearAnimation()
-        mBinding.navView.animate().translationY(0f).duration = 300
-        mBinding.navView.visibility = View.VISIBLE
+        binding.navView.clearAnimation()
+        binding.navView.animate().translationY(0f).duration = 300
+        binding.navView.visibility = View.VISIBLE
+    }
+
+    companion object {
+
+        fun setAlarm(context: Context, nowSeconds: Long, secondsRemaining: Long): Long{
+            val wakeUpTime = (nowSeconds + secondsRemaining) * 1000
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            val intent = Intent(context, TimerExpiredReceiver::class.java)
+            val pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, wakeUpTime, pendingIntent)
+            PrefUtil.setAlarmSetTime(nowSeconds, context)
+            return wakeUpTime
+        }
+
+        fun removeAlarm(context: Context){
+            val intent = Intent(context, TimerExpiredReceiver::class.java)
+            val pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            alarmManager.cancel(pendingIntent)
+            PrefUtil.setAlarmSetTime(0, context)
+        }
+
+        val nowSeconds: Long
+            get() = Calendar.getInstance().timeInMillis / 1000
     }
 }

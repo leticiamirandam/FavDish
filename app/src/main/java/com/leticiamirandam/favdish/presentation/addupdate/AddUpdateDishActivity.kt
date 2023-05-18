@@ -51,76 +51,75 @@ import java.io.IOException
 import java.io.OutputStream
 import java.util.*
 
+private const val IMAGE_QUALITY = 100
+
 class AddUpdateDishActivity : AppCompatActivity(), View.OnClickListener {
 
-    private lateinit var mBinding: ActivityAddUpdateDishBinding
-    private var mImagePath: String = ""
-
-    private lateinit var mCustomListDialog: Dialog
-    private var mFavDishDetails: FavDish? = null
-
+    private lateinit var binding: ActivityAddUpdateDishBinding
+    private lateinit var customListDialog: Dialog
+    private var favDishDetails: FavDish? = null
+    private var imagePath: String = ""
     private val addUpdateViewModel: AddUpdateViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mBinding = ActivityAddUpdateDishBinding.inflate(layoutInflater)
-        setContentView(mBinding.root)
+        binding = ActivityAddUpdateDishBinding.inflate(layoutInflater)
+        overridePendingTransition(R.anim.anim_slide_in, R.anim.anim_fade_out)
+
+        setContentView(binding.root)
+        setupOnClickListeners()
+        setupActionBar()
 
         if (intent.hasExtra(Constants.EXTRA_DISH_DETAILS)) {
-            mFavDishDetails = intent.getParcelableExtra(Constants.EXTRA_DISH_DETAILS)
+            favDishDetails = intent.getParcelableExtra(Constants.EXTRA_DISH_DETAILS)
         }
-
-        setupActionBar()
-        mFavDishDetails?.let { setupFavDishOnUI(it) }
-        setupListeners()
-    }
-
-    private fun setupFavDishOnUI(favDish: FavDish) {
-        if (favDish.id != 0) {
-            mImagePath = favDish.image
-            Glide.with(this@AddUpdateDishActivity)
-                .load(mImagePath)
-                .centerCrop()
-                .into(mBinding.ivDishImage)
-            mBinding.etTitle.setText(favDish.title)
-            mBinding.etType.setText(favDish.type)
-            mBinding.etCategory.setText(favDish.category)
-            mBinding.etIngredients.setText(favDish.ingredients)
-            mBinding.etCookingTime.setText(favDish.cookingTime)
-            mBinding.etDirectionToCook.setText(favDish.directionToCook)
-            mBinding.btnAddDish.text = resources.getString(R.string.lbl_update_dish)
+        favDishDetails?.let {
+            if (it.id != 0)
+                showFavDishDetails(it)
         }
     }
 
-    private fun setupListeners() {
-        mBinding.ivAddDishImage.setOnClickListener(this)
-        mBinding.etType.setOnClickListener(this)
-        mBinding.etCategory.setOnClickListener(this)
-        mBinding.etCookingTime.setOnClickListener(this)
-        mBinding.btnAddDish.setOnClickListener(this)
+    private fun showFavDishDetails(favDish: FavDish) {
+        imagePath = favDish.image
+        Glide.with(this@AddUpdateDishActivity)
+            .load(imagePath)
+            .centerCrop()
+            .into(binding.ivDishImage)
+        binding.etTitle.setText(favDish.title)
+        binding.etType.setText(favDish.type)
+        binding.etCategory.setText(favDish.category)
+        binding.etIngredients.setText(favDish.ingredients)
+        binding.etCookingTime.setText(favDish.cookingTime)
+        binding.etDirectionToCook.setText(favDish.directionToCook)
+        binding.btnAddDish.text = resources.getString(R.string.lbl_update_dish)
+    }
+
+    private fun setupOnClickListeners() {
+        binding.ivAddDishImage.setOnClickListener(this)
+        binding.etType.setOnClickListener(this)
+        binding.etCategory.setOnClickListener(this)
+        binding.etCookingTime.setOnClickListener(this)
+        binding.btnAddDish.setOnClickListener(this)
     }
 
     override fun onClick(v: View) {
         when (v.id) {
             R.id.iv_add_dish_image -> {
                 customImageSelectionDialog()
-                return
             }
             R.id.et_type -> {
-                customItemsDialog(
+                showCustomItemsDialog(
                     resources.getString(R.string.title_select_dish_type),
                     resources.getStringArray(R.array.dish_types).toList(),
                     Constants.DISH_TYPE
                 )
-                return
             }
             R.id.et_category -> {
-                customItemsDialog(
+                showCustomItemsDialog(
                     resources.getString(R.string.title_select_dish_category),
                     resources.getStringArray(R.array.dish_categories).toList(),
                     Constants.DISH_CATEGORY
                 )
-                return
             }
             R.id.btn_add_dish -> {
                 addDish()
@@ -129,14 +128,14 @@ class AddUpdateDishActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun addDish() {
-        val title = mBinding.etTitle.getTextFormatted()
-        val type = mBinding.etType.getTextFormatted()
-        val category = mBinding.etCategory.getTextFormatted()
-        val ingredients = mBinding.etIngredients.getTextFormatted()
-        val cookingTimeInMinutes = mBinding.etCookingTime.getTextFormatted()
-        val cookingDirection = mBinding.etDirectionToCook.getTextFormatted()
+        val title = binding.etTitle.getTextFormatted()
+        val type = binding.etType.getTextFormatted()
+        val category = binding.etCategory.getTextFormatted()
+        val ingredients = binding.etIngredients.getTextFormatted()
+        val cookingTimeInMinutes = binding.etCookingTime.getTextFormatted()
+        val cookingDirection = binding.etDirectionToCook.getTextFormatted()
         when {
-            TextUtils.isEmpty(mImagePath) -> {
+            TextUtils.isEmpty(imagePath) -> {
                 showFeedbackToast(
                     this@AddUpdateDishActivity,
                     getString(R.string.err_msg_select_dish_image)
@@ -147,7 +146,7 @@ class AddUpdateDishActivity : AppCompatActivity(), View.OnClickListener {
                 var imageSource = Constants.DISH_IMAGE_SOURCE_LOCAL
                 var favoriteDish = false
 
-                mFavDishDetails?.let {
+                favDishDetails?.let {
                     if (it.id != 0) {
                         dishID = it.id!!
                         imageSource = it.imageSource
@@ -156,7 +155,7 @@ class AddUpdateDishActivity : AppCompatActivity(), View.OnClickListener {
                 }
 
                 val favDishDetails = FavDish(
-                    image = mImagePath,
+                    image = imagePath,
                     imageSource = imageSource,
                     title = title,
                     type = type,
@@ -182,6 +181,11 @@ class AddUpdateDishActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
+    override fun finish() {
+        super.finish()
+        overridePendingTransition(R.anim.anim_fade_in, R.anim.anim_slide_out)
+    }
+
     private fun addNewDish(favDish: FavDish) {
         addUpdateViewModel.insert(favDish)
         showFeedbackToast(this, getString(R.string.dish_details_added_successfully))
@@ -199,16 +203,16 @@ class AddUpdateDishActivity : AppCompatActivity(), View.OnClickListener {
     fun selectedListItem(item: String, selection: String) {
         when (selection) {
             Constants.DISH_TYPE -> {
-                mCustomListDialog.dismiss()
-                mBinding.etType.setText(item)
+                customListDialog.dismiss()
+                binding.etType.setText(item)
             }
             Constants.DISH_CATEGORY -> {
-                mCustomListDialog.dismiss()
-                mBinding.etCategory.setText(item)
+                customListDialog.dismiss()
+                binding.etCategory.setText(item)
             }
             else -> {
-                mCustomListDialog.dismiss()
-                mBinding.etCookingTime.setText(item)
+                customListDialog.dismiss()
+                binding.etCookingTime.setText(item)
             }
         }
     }
@@ -223,9 +227,9 @@ class AddUpdateDishActivity : AppCompatActivity(), View.OnClickListener {
                     Glide.with(this)
                         .load(thumbnail)
                         .centerCrop()
-                        .into(mBinding.ivDishImage)
-                    mImagePath = saveImageToInternalStorage(thumbnail)
-                    mBinding.ivAddDishImage.setImageDrawable(
+                        .into(binding.ivDishImage)
+                    imagePath = saveImageToInternalStorage(thumbnail)
+                    binding.ivAddDishImage.setImageDrawable(
                         ContextCompat.getDrawable(
                             this@AddUpdateDishActivity,
                             R.drawable.ic_vector_edit
@@ -258,14 +262,14 @@ class AddUpdateDishActivity : AppCompatActivity(), View.OnClickListener {
                             ): Boolean {
                                 resource?.let {
                                     val bitmap: Bitmap = resource.toBitmap()
-                                    mImagePath = saveImageToInternalStorage(bitmap)
+                                    imagePath = saveImageToInternalStorage(bitmap)
                                 }
                                 return false
                             }
                         })
                         .centerCrop()
-                        .into(mBinding.ivDishImage)
-                    mBinding.ivAddDishImage.setImageDrawable(
+                        .into(binding.ivDishImage)
+                    binding.ivAddDishImage.setImageDrawable(
                         ContextCompat.getDrawable(
                             this@AddUpdateDishActivity,
                             R.drawable.ic_vector_edit
@@ -279,8 +283,8 @@ class AddUpdateDishActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun setupActionBar() {
-        setSupportActionBar(mBinding.toolbarAddDishActivity)
-        if (mFavDishDetails != null && mFavDishDetails!!.id != 0) {
+        setSupportActionBar(binding.toolbarAddDishActivity)
+        if (favDishDetails != null && favDishDetails!!.id != 0) {
             supportActionBar?.let {
                 it.title = resources.getString(R.string.title_edit_dish)
             }
@@ -293,7 +297,7 @@ class AddUpdateDishActivity : AppCompatActivity(), View.OnClickListener {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_arrow_back)
 
-        mBinding.toolbarAddDishActivity.setNavigationOnClickListener { onBackPressed() }
+        binding.toolbarAddDishActivity.setNavigationOnClickListener { onBackPressed() }
     }
 
     private fun customImageSelectionDialog() {
@@ -389,29 +393,28 @@ class AddUpdateDishActivity : AppCompatActivity(), View.OnClickListener {
     private fun saveImageToInternalStorage(bitmap: Bitmap): String {
         val wrapper = ContextWrapper(applicationContext)
         var file = wrapper.getDir(IMAGE_DIRECTORY, Context.MODE_PRIVATE)
-        file = File(file, "${UUID.randomUUID()}.jpg")
+        file = File(file, "${UUID.randomUUID()}.png")
         try {
             val stream: OutputStream = FileOutputStream(file)
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+            bitmap.compress(Bitmap.CompressFormat.PNG, IMAGE_QUALITY, stream)
             stream.flush()
             stream.close()
         } catch (e: IOException) {
-            e.printStackTrace()
+            Log.e("Image error: ", e.stackTraceToString())
         }
         return file.absolutePath
     }
 
-    private fun customItemsDialog(title: String, itemsList: List<String>, selection: String) {
-        mCustomListDialog = Dialog(this)
+    private fun showCustomItemsDialog(title: String, itemsList: List<String>, selection: String) {
+        customListDialog = Dialog(this)
         val binding: DialogCustomListBinding = DialogCustomListBinding.inflate(layoutInflater)
-        mCustomListDialog.setContentView(binding.root)
+        customListDialog.setContentView(binding.root)
         binding.tvTitle.text = title
         binding.rvList.layoutManager = LinearLayoutManager(this)
         val adapter = CustomListItemAdapter(this, null, itemsList, selection)
         binding.rvList.adapter = adapter
-        mCustomListDialog.show()
+        customListDialog.show()
     }
-
 
     private fun showFeedbackToast(context: Context, message: String) {
         Toast.makeText(context, message, Toast.LENGTH_LONG).show()
